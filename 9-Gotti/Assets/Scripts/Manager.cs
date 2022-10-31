@@ -17,7 +17,7 @@ public class Manager : Singleton<Manager> {
     private void StartPlacing() {
 
     }
-    private void EnableDragDrop() {
+    public void EnableDragDrop() {
         GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
         foreach (GameObject p in players) {
             p.GetComponent<DragDrop>().enabled = true;

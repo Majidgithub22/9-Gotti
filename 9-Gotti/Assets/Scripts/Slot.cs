@@ -11,7 +11,10 @@ public class Slot : MonoBehaviour
         if (other.gameObject.CompareTag("Player")) {
             status = 1;
             other.gameObject.GetComponent<DragDrop>().enabled = false;
-            other.gameObject.transform.parent.GetComponent<Slot>().status = 0;
+            if (Manager.Instance.play) {
+                Manager.Instance.EnableDragDrop();
+                other.gameObject.transform.parent.GetComponent<Slot>().status = 0;
+            }
             other.gameObject.transform.SetParent(gameObject.transform,false);
             other.gameObject.transform.localPosition =new Vector3(0,1f,0);
             other.gameObject.transform.localScale =new Vector3(1,1f,1);
