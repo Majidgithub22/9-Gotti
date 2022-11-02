@@ -10,6 +10,8 @@ public class Manager : Singleton<Manager> {
     private int distanceBtwPlayers=-25;
     private int placePlayerCount;
     private GameObject[] walls;
+    private GameObject[] moves;
+
     public void PlacePlayers() {
         placePlayerCount++;
         if (placePlayerCount >= 5) {
@@ -19,6 +21,7 @@ public class Manager : Singleton<Manager> {
     }
     private void Start() {
         walls = GameObject.FindGameObjectsWithTag("Wall");
+        moves = GameObject.FindGameObjectsWithTag("Pillar");
         StartPlacing();
     }
     private void StartPlacing() {
@@ -35,9 +38,16 @@ public class Manager : Singleton<Manager> {
         }
     }
     public void DisableMoves() {
-        GameObject[] moves = GameObject.FindGameObjectsWithTag("Pillar");
         foreach (GameObject m in moves) {
             m.GetComponent<CapsuleCollider>().enabled = false;
+        }
+    }
+    public void FindMoves(string movename) {
+        foreach (GameObject m in moves) {
+            if (m.name == movename) {
+                m.GetComponent<Slot>().status = 0;
+            }
+         //   m.GetComponent<CapsuleCollider>().enabled = false;
         }
     }
     public void DisableWallColliders() {

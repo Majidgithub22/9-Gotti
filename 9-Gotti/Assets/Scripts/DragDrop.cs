@@ -72,10 +72,10 @@ public class DragDrop : MonoBehaviour {
             }
         
     }
-    [PunRPC]
-    private void UpdateParentStatus(GameObject obj) {
-        obj.gameObject.GetComponent<DragDrop>().parent.GetComponent<Slot>().status = 0;
-    }
+    //[PunRPC]
+    //private void UpdateParentStatus(GameObject obj) {
+    //    obj.gameObject.GetComponent<DragDrop>().parent.GetComponent<Slot>().status = 0;
+    //}
     //IEnumerator Resize(GameObject obj) {
     //    yield return new WaitForSeconds(1);
     //    int a = 0;
