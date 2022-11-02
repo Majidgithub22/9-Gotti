@@ -26,7 +26,7 @@ public class Manager : Singleton<Manager> {
         photonView= GetComponent<PhotonView>();
         walls = GameObject.FindGameObjectsWithTag("Wall");
         moves = GameObject.FindGameObjectsWithTag("Pillar");
-        photonView.RPC("showName", RpcTarget.All);
+        photonView.RPC("showName", RpcTarget.AllBuffered);
         StartPlacing();
     }
     private void StartPlacing() {
