@@ -1,17 +1,20 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using Photon.Pun;
 
 public class Manager : Singleton<Manager> {
     public Camera Camera;
+    public Text p1Name;
+    public Text p2Name;
     public float p1X,p1Y,p1Z,p2X,p2Y,p2Z;
     public bool play;
     private int distanceBtwPlayers=-25;
     private int placePlayerCount;
     private GameObject[] walls;
     private GameObject[] moves;
-
+    private PhotonView photonView;
     public void PlacePlayers() {
         placePlayerCount++;
         if (placePlayerCount >= 18) {
@@ -20,8 +23,10 @@ public class Manager : Singleton<Manager> {
         }
     }
     private void Start() {
+        photonView= GetComponent<PhotonView>();
         walls = GameObject.FindGameObjectsWithTag("Wall");
         moves = GameObject.FindGameObjectsWithTag("Pillar");
+        photonView.RPC("showName", RpcTarget.All);
         StartPlacing();
     }
     private void StartPlacing() {
@@ -60,7 +65,15 @@ public class Manager : Singleton<Manager> {
             w.GetComponent<BoxCollider>().enabled = false;
         }
     }
-
+    [PunRPC]
+    private void showName() {
+        if (PhotonNetwork.IsMasterClient) {
+            p1Name.text = PhotonNetwork.NickName;
+        } 
+        else { 
+            p2Name.text = PhotonNetwork.NickName;
+        }
+    }
     IEnumerator InstantiatePlayer(string player,float x,float y,float z) {
         int totalPlayer =0;
         yield return new WaitForSeconds(1);
