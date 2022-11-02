@@ -45,15 +45,18 @@ public class TestConnect : MonoBehaviourPunCallbacks {
         OnClick_CreateRoom();
     }
     public void OnClick_CreateRoom() {
+        displayInfo.text = "In Lobby";
         if (!PhotonNetwork.IsConnected) return;
         RoomOptions options = new RoomOptions();
         options.MaxPlayers =2;
         PhotonNetwork.JoinOrCreateRoom("Race", options, TypedLobby.Default);
     }
     public override void OnCreatedRoom() {
-        OnCLick_StartGame();
+        displayInfo.text = "Room Created";
+      //  OnCLick_StartGame();
     }
     public override void OnJoinedRoom() {
+        displayInfo.text = "Room Joined";
         OnCLick_StartGame();
     }
     public void OnCLick_StartGame() {

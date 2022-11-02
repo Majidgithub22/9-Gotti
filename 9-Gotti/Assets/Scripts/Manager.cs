@@ -3,13 +3,15 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using Photon.Pun;
+using Photon.Realtime;
 
 public class Manager : Singleton<Manager> {
     public Camera Camera;
-    public Text p1Name;
-    public Text p2Name;
+    public Text[] playerNames;
+    //p1Name;
+   // public Text p2Name;
     public float p1X,p1Y,p1Z,p2X,p2Y,p2Z;
-    public bool play;
+    public bool play,isSpawn=false;
     private int distanceBtwPlayers=-25;
     private int placePlayerCount;
     private GameObject[] walls;
@@ -26,7 +28,11 @@ public class Manager : Singleton<Manager> {
         photonView= GetComponent<PhotonView>();
         walls = GameObject.FindGameObjectsWithTag("Wall");
         moves = GameObject.FindGameObjectsWithTag("Pillar");
-        photonView.RPC("showName", RpcTarget.AllBuffered);
+       // if (PhotonNetwork.IsMasterClient) {
+            photonView.RPC("showName", RpcTarget.AllBuffered);
+       // } else {
+       //     photonView.RPC("showName", RpcTarget.All, 1, PhotonNetwork.NickName);
+       // }
         StartPlacing();
     }
     private void StartPlacing() {
@@ -35,12 +41,23 @@ public class Manager : Singleton<Manager> {
         } else {
             StartCoroutine(InstantiatePlayer("Player2", p2X, p2Y, p2Z));
         }
+       
     }
     public void EnableDragDrop() {
         GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
         foreach (GameObject p in players) {
             p.GetComponent<DragDrop>().enabled = true;
         }
+    }
+    [PunRPC]
+    private void StartGame() {
+        GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
+        if (players.Length >= 17) {
+            //    foreach (GameObject p in players) {
+            //        p.GetComponent<DragDrop>().enabled = true;
+        Manager.Instance.isSpawn = true;
+        }
+        //}
     }
     public void DisableMoves() {
         foreach (GameObject m in moves) {
@@ -67,13 +84,17 @@ public class Manager : Singleton<Manager> {
     }
     [PunRPC]
     private void showName() {
-        if (PhotonNetwork.IsMasterClient) {
-            p1Name.text = PhotonNetwork.NickName;
-        } 
-        else { 
-            p2Name.text = PhotonNetwork.NickName;
+        int i = 0;
+        foreach(Player p in PhotonNetwork.PlayerList) {
+            playerNames[i].text = p.NickName;
+            i++;
         }
-    }
+        //if (a == 0) {
+        //    p1Name.text = name;
+        //} else {
+        //    p2Name.text = PhotonNetwork.NickName;
+        //}
+        }
     IEnumerator InstantiatePlayer(string player,float x,float y,float z) {
         int totalPlayer =0;
         yield return new WaitForSeconds(1);
@@ -83,5 +104,6 @@ public class Manager : Singleton<Manager> {
             yield return new WaitForSeconds(0.6f);
             totalPlayer++;
         }
+        photonView.RPC("StartGame", RpcTarget.AllBuffered);
     }
 }

@@ -8016,8 +8016,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   DontDestroy: 0
   Camera: {fileID: 1233955580}
-  p1Name: {fileID: 1968116177}
-  p2Name: {fileID: 873012965}
+  playerNames:
+  - {fileID: 1968116177}
+  - {fileID: 873012965}
   p1X: 30
   p1Y: 10
   p1Z: 350
@@ -8025,6 +8026,7 @@ MonoBehaviour:
   p2Y: 10
   p2Z: 350
   play: 0
+  isSpawn: 0
 --- !u!114 &2036157549
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -21,12 +21,10 @@ public class DragDrop : MonoBehaviour {
         photonView = GetComponent<PhotonView>();
     }
     private void Update() {
-        if (photonView.IsMine) {
+        if (photonView.IsMine&&Manager.Instance.isSpawn) {
             if (isDragging) {  DragObject(); }
         }
-    
     }
-
     private void OnMouseDown() {
         startPos = gameObject.transform.localPosition;
         Vector3 mousePos = Input.mousePosition;
@@ -34,12 +32,9 @@ public class DragDrop : MonoBehaviour {
         if (!myCam.orthographic) {
             mousePos.z = 10;
         }
-
         mousePos = myCam.ScreenToWorldPoint(mousePos);
-
         startXPos = mousePos.x - transform.position.x;
         startZPos = mousePos.z - transform.position.z;
-
         isDragging = true;
     }
 
