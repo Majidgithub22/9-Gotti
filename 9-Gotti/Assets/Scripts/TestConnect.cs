@@ -50,6 +50,9 @@ public class TestConnect : MonoBehaviourPunCallbacks {
         options.MaxPlayers =2;
         PhotonNetwork.JoinOrCreateRoom("Race", options, TypedLobby.Default);
     }
+    public override void OnCreatedRoom() {
+        OnCLick_StartGame();
+    }
     public override void OnJoinedRoom() {
         OnCLick_StartGame();
     }
