@@ -14,7 +14,7 @@ public class Manager : Singleton<Manager> {
 
     public void PlacePlayers() {
         placePlayerCount++;
-        if (placePlayerCount >= 5) {
+        if (placePlayerCount >= 18) {
             EnableDragDrop();
             play = true;
         }
