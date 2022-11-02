@@ -3,25 +3,32 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 using UnityEngine.EventSystems;
-
+using Photon.Pun;
 public class DragDrop : MonoBehaviour {
-
-
-    public Camera myCam;
+    [SerializeField]
+    public GameObject parent;
+    [SerializeField]
+    public bool isSet = false;
+    private Camera myCam;
     private float startXPos;
     private float startZPos;
     private Vector3 startPos;
     private bool isDragging = false;
-    private bool isSet = false;
+    private PhotonView photonView;
     private List<GameObject> list = new List<GameObject>();
+    private void Start() {
+        myCam = Manager.Instance.Camera;
+        photonView = GetComponent<PhotonView>();
+    }
     private void Update() {
-        if (isDragging) {
-            DragObject();
+        if (photonView.IsMine) {
+            if (isDragging) {  DragObject(); }
         }
+    
     }
 
     private void OnMouseDown() {
-        startPos = gameObject.transform.position;
+        startPos = gameObject.transform.localPosition;
         Vector3 mousePos = Input.mousePosition;
         if (Manager.Instance.play) { asd(); }
         if (!myCam.orthographic) {
@@ -41,26 +48,33 @@ public class DragDrop : MonoBehaviour {
         foreach (GameObject obj in list) {
             SizeDown(obj);
         }
+        if (!isSet) {
+            transform.position = startPos;
+        } else {
+            transform.localPosition = parent.transform.position;// new Vector3(0, 1f, 0);
+            isSet = false; }
     }
-
     public void DragObject() {
         Vector3 mousePos = Input.mousePosition;
-
         if (!myCam.orthographic) {
             mousePos.z = 10;
         }
-
         mousePos = myCam.ScreenToWorldPoint(mousePos);
         transform.position = new Vector3(mousePos.x - startXPos, transform.position.y, mousePos.z - startZPos); //*Time.deltaTime*speed;
     }
     private void asd() {
-        for(int i = 0;i< transform.parent.GetComponent<Slot>().moves.Length;i++)
-            if (transform.parent.GetComponent<Slot>().moves[i].GetComponent<Slot>().status == 0) {
-                list.Add(transform.parent.GetComponent<Slot>().moves[i].gameObject);
-                transform.parent.GetComponent<Slot>().moves[i].GetComponent<CapsuleCollider>().enabled = true;
-               SizeUP(transform.parent.GetComponent<Slot>().moves[i].gameObject);
+        Manager.Instance.DisableMoves();
+        for(int i = 0;i<parent.GetComponent<Slot>().moves.Length;i++)
+            if (parent.GetComponent<Slot>().moves[i].GetComponent<Slot>().status == 0) {
+                list.Add(parent.GetComponent<Slot>().moves[i].gameObject);
+                parent.GetComponent<Slot>().moves[i].GetComponent<CapsuleCollider>().enabled = true;
+               SizeUP(parent.GetComponent<Slot>().moves[i].gameObject);
             }
         
+    }
+    [PunRPC]
+    private void UpdateParentStatus(GameObject obj) {
+        obj.gameObject.GetComponent<DragDrop>().parent.GetComponent<Slot>().status = 0;
     }
     //IEnumerator Resize(GameObject obj) {
     //    yield return new WaitForSeconds(1);
