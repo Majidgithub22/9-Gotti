@@ -7,6 +7,7 @@ TagManager:
   - Bullet
   - Pillar
   - Wall
+  - Wall1
   layers:
   - Default
   - TransparentFX

@@ -6,7 +6,7 @@ using UnityEngine.EventSystems;
 using Photon.Pun;
 public class DragDrop : MonoBehaviour {
     [SerializeField]
-    public GameObject parent;
+    public GameObject parent,wall,wall1;
     [SerializeField]
     public bool isSet = false;
     private Camera myCam;
@@ -40,6 +40,7 @@ public class DragDrop : MonoBehaviour {
 
     private void OnMouseUp() {
         isDragging = false;
+       // Manager.Instance.EnableWallColliders();
         foreach (GameObject obj in list) {
             SizeDown(obj);
         }
@@ -48,6 +49,8 @@ public class DragDrop : MonoBehaviour {
         } else {
             transform.localPosition = parent.transform.position;// new Vector3(0, 1f, 0);
             isSet = false; }
+        if (wall != null){ checkSibling(wall); }
+        if (wall1 != null) { checkSibling(wall1); }
     }
     public void DragObject() {
         Vector3 mousePos = Input.mousePosition;
@@ -89,4 +92,63 @@ public class DragDrop : MonoBehaviour {
         obj.transform.localScale = new Vector3(20, 5, 20);
 
     }
-}
+    private void OnTriggerEnter(Collider other) {
+        if (other.gameObject.CompareTag("Wall")) {
+         //   Debug.Log("wall  " + other.gameObject.name);
+            if (wall != null) { CheckPreviousParent(wall); }
+            wall = other.gameObject;
+            //   other.gameObject.GetComponent<BoxCollider>().enabled = true;
+
+        }
+        if (other.gameObject.CompareTag("Wall1")) {
+            if (wall1 != null) { CheckPreviousParent(wall1); }
+          //  Debug.Log("1wall   " + other.gameObject.name);
+            wall1 = other.gameObject;
+            //   other.gameObject.GetComponent<BoxCollider>().enabled = true;
+
+        }
+    }
+    private void checkSibling(GameObject wall) {
+        if (!wall.GetComponent<Wall>().p1 && !wall.GetComponent<Wall>().p2 && !wall.GetComponent<Wall>().p3) {
+            Debug.Log("I am activating p1" );
+            wall.GetComponent<Wall>().g1 = gameObject;
+            wall.GetComponent<Wall>().p1 = true;
+        } else if (wall.GetComponent<Wall>().p1 && !wall.GetComponent<Wall>().p2 && !wall.GetComponent<Wall>().p3) {
+            if (wall.GetComponent<Wall>().g1.GetComponent<PhotonView>().ViewID != gameObject.GetComponent<PhotonView>().ViewID) {
+                Debug.Log("I am activating p2");
+                wall.GetComponent<Wall>().g2 = gameObject;
+                wall.GetComponent<Wall>().p2 = true;
+            }
+        } else if (wall.GetComponent<Wall>().p1 && wall.GetComponent<Wall>().p2 && !wall.GetComponent<Wall>().p3) {
+            if (wall.GetComponent<Wall>().g1.GetComponent<PhotonView>().ViewID != gameObject.GetComponent<PhotonView>().ViewID && wall.GetComponent<Wall>().g2.GetComponent<PhotonView>().ViewID != gameObject.GetComponent<PhotonView>().ViewID) {
+                wall.GetComponent<Wall>().g3 = gameObject;
+                wall.GetComponent<Wall>().p3 = true;
+            }
+        }
+        //if (!wall1.GetComponent<Wall>().p1 && !wall1.GetComponent<Wall>().p2 && !wall1.GetComponent<Wall>().p3) {
+        //    wall1.GetComponent<Wall>().g1 = gameObject;
+        //    wall1.GetComponent<Wall>().p1 = true;
+        //} else if (wall1.GetComponent<Wall>().p1 && !wall1.GetComponent<Wall>().p2 && !wall1.GetComponent<Wall>().p3) {
+        //    wall1.GetComponent<Wall>().g2 = gameObject;
+        //    wall1.GetComponent<Wall>().p2 = true;
+        //} else if (wall1.GetComponent<Wall>().p1 && wall1.GetComponent<Wall>().p2 && !wall1.GetComponent<Wall>().p3) {
+        //    wall1.GetComponent<Wall>().g3 = gameObject;
+        //    wall1.GetComponent<Wall>().p3 = true;
+        //}
+        }
+        private void CheckPreviousParent(GameObject wall) {
+        //if parent have p1 but no p2 and p3.
+        if (wall.GetComponent<Wall>().p1 && !wall.GetComponent<Wall>().p2 && !wall.GetComponent<Wall>().p3) {
+            wall.GetComponent<Wall>().g1 = null;
+            wall.GetComponent<Wall>().p1 = false;
+            //if parent have p1 ,p2but no  p3.
+        } else if (wall.GetComponent<Wall>().p1 && wall.GetComponent<Wall>().p2 && !wall.GetComponent<Wall>().p3) {
+            wall.GetComponent<Wall>().g2 = null;
+            wall.GetComponent<Wall>().p2 = false;
+            //if parent have p1, p2,and p3
+        } else if (wall.GetComponent<Wall>().p1 && wall.GetComponent<Wall>().p2 && wall.GetComponent<Wall>().p3) {
+            wall.GetComponent<Wall>().g3 = null;
+            wall.GetComponent<Wall>().p3 = false;
+        }
+    }     
+    }

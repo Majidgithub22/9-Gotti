@@ -64,7 +64,7 @@ public class TestConnect : MonoBehaviourPunCallbacks {
          //   PhotonNetwork.CurrentRoom.IsVisible = false;
             PhotonNetwork.AutomaticallySyncScene = true;
             PhotonNetwork.LoadLevel(1);
-            Debug.Log("loadingScene");
+        //    Debug.Log("loadingScene");
         }
 
     public override void OnDisconnected(DisconnectCause cause) {

@@ -113,6 +113,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   parent: {fileID: 0}
+  wall: {fileID: 0}
+  wall1: {fileID: 0}
   isSet: 0
 --- !u!54 &9010715093899897351
 Rigidbody:

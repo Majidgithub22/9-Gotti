@@ -8,8 +8,6 @@ using Photon.Realtime;
 public class Manager : Singleton<Manager> {
     public Camera Camera;
     public Text[] playerNames;
-    //p1Name;
-   // public Text p2Name;
     public float p1X,p1Y,p1Z,p2X,p2Y,p2Z;
     public bool play,isSpawn=false;
     private int distanceBtwPlayers=-25;
@@ -19,7 +17,7 @@ public class Manager : Singleton<Manager> {
     private PhotonView photonView;
     public void PlacePlayers() {
         placePlayerCount++;
-        if (placePlayerCount >= 18) {
+        if (placePlayerCount >= 5) {
             EnableDragDrop();
             play = true;
         }
@@ -28,12 +26,9 @@ public class Manager : Singleton<Manager> {
         photonView= GetComponent<PhotonView>();
         walls = GameObject.FindGameObjectsWithTag("Wall");
         moves = GameObject.FindGameObjectsWithTag("Pillar");
-       // if (PhotonNetwork.IsMasterClient) {
             photonView.RPC("showName", RpcTarget.AllBuffered);
-       // } else {
-       //     photonView.RPC("showName", RpcTarget.All, 1, PhotonNetwork.NickName);
-       // }
         StartPlacing();
+        EnableWallColliders();
     }
     private void StartPlacing() {
         if (PhotonNetwork.IsMasterClient) {
@@ -52,12 +47,9 @@ public class Manager : Singleton<Manager> {
     [PunRPC]
     private void StartGame() {
         GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
-        if (players.Length >= 17) {
-            //    foreach (GameObject p in players) {
-            //        p.GetComponent<DragDrop>().enabled = true;
+        if (players.Length >=5) {
         Manager.Instance.isSpawn = true;
         }
-        //}
     }
     public void DisableMoves() {
         foreach (GameObject m in moves) {
@@ -79,7 +71,7 @@ public class Manager : Singleton<Manager> {
     }
     public void EnableWallColliders() {
         foreach (GameObject w in walls) {
-            w.GetComponent<BoxCollider>().enabled = false;
+            w.GetComponent<BoxCollider>().enabled = true;
         }
     }
     [PunRPC]
@@ -89,11 +81,6 @@ public class Manager : Singleton<Manager> {
             playerNames[i].text = p.NickName;
             i++;
         }
-        //if (a == 0) {
-        //    p1Name.text = name;
-        //} else {
-        //    p2Name.text = PhotonNetwork.NickName;
-        //}
         }
     IEnumerator InstantiatePlayer(string player,float x,float y,float z) {
         int totalPlayer =0;

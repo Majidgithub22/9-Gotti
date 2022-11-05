@@ -16,22 +16,12 @@ public class Slot : MonoBehaviour
         if (other.gameObject.CompareTag("Player")) {
             status = 1;
             if (Manager.Instance.play) {
-                // Manager.Instance.EnableDragDrop();
-                // other.gameObject.GetComponent<DragDrop>().parent.GetComponent<Slot>().status = 0;
-                Debug.Log("no errroe here");
                 //Update Status of client
                photonView.RPC("UpdateStatus", RpcTarget.AllBuffered, other.gameObject.GetComponent<DragDrop>().parent.name);
-                Debug.Log("i guess 1 errroe here");
             }
-            // other.gameObject.transform.SetParent(gameObject.transform,false);
-            //  other.gameObject.transform.position =new Vector3(0,4f,0);
             other.gameObject.transform.position = transform.position;
             other.gameObject.GetComponent<DragDrop>().parent = gameObject ;
-                Debug.Log("i guess 2 errroe here");
-
-            //other.gameObject.transform.localScale =new Vector3(1,1f,1);
             gameObject.GetComponent<CapsuleCollider>().enabled = false;
-            Debug.Log("i guess 3 errroe here");
 
             other.gameObject.GetComponent<DragDrop>().enabled = false;
             other.gameObject.GetComponent<DragDrop>().isSet = true;
