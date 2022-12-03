@@ -7,58 +7,34 @@ public class Slot : MonoBehaviour
 {
     public int status;
     public GameObject[] moves;
+    public GameObject wall, wall1;
     private PhotonView photonView;
     private List<GameObject> slots = new List<GameObject>();
     private void Awake() {
         photonView = GetComponent<PhotonView>();
     }
     private void OnTriggerEnter(Collider other) {
-        if (other.gameObject.CompareTag("Player")) {
-            status = 1;
-            if (Manager.Instance.play) {
-                //Update Status of client
-               photonView.RPC("UpdateStatus", RpcTarget.AllBuffered, other.gameObject.GetComponent<DragDrop>().parent.name);
-            }
-            other.gameObject.transform.position = transform.position;
-            other.gameObject.GetComponent<DragDrop>().parent = gameObject ;
-            gameObject.GetComponent<CapsuleCollider>().enabled = false;
+        if (other.gameObject.CompareTag("Player")&&status==0) {
+            //in progress
+           // status = 1;
+            //if (Manager.Instance.play) {
+            //    //Update Status of client
+            //   photonView.RPC("UpdateStatus", RpcTarget.AllBuffered, other.gameObject.GetComponent<DragDrop>().parent.name);
+            //}
+            //------------------
+          //  other.gameObject.transform.position = transform.position;//set position of gotti
+            other.gameObject.GetComponent<DragDrop>().temparent = gameObject ;//set parent
+           // gameObject.GetComponent<CapsuleCollider>().enabled = false;//deactivate gameobject collider to disable further interaction
 
-            other.gameObject.GetComponent<DragDrop>().enabled = false;
-            other.gameObject.GetComponent<DragDrop>().isSet = true;
-            Manager.Instance.PlacePlayers();
+            //other.gameObject.GetComponent<DragDrop>().enabled = false;//disable drag drop scrip of parent
+            other.gameObject.GetComponent<DragDrop>().isSet = true;//set bool to check whether moved to new place.
+            ////Manager.Instance.PlacePlayers();//again enable drag drop
         }
     }
-    [PunRPC]
-   private void UpdateStatus(string name) {
-        //set previous move status to 0 so ther moves can move there.
-        Manager.Instance.FindMoves(name);
-    }
-    //private void SetStatus(int status) {
-    //    this.status= status;
-    //}
-    //private void FindMoveableSlots(int wall, int child) {
-    //    for (int i = 0; i < wall; i++) {
-    //        for (int j = 0; i < child; j++) {
-    //            if (gameObject.name != moves[i].GetComponent<Wall>().moves[j].gameObject.name&& moves[i].GetComponent<Slot>().status==0) {
-    //                slots.Add(moves[i]);
-    //            }
-    //        }
-    //}
-    //}
-    //private void NavigateMoves() {
-    //    foreach (GameObject slot in slots) {
-    //        StartCoroutine(Resize(slot));
-    //    }
-    //}
-
-    //IEnumerator Resize(GameObject obj) {
-    //        yield return new WaitForSeconds(1);
-    //        int a = 0;
-    //        while (a < 10) {
-    //            a++;
-    //            obj.transform.localScale = new Vector3(1.3f, 1, 1.3f);
-    //            yield return new WaitForSeconds(0.3f);
-    //            obj.transform.localScale = new Vector3(1, 1, 1);
-    //        }
-    //    }
+   //// [PunRPC]
+   ////private void UpdateStatus(string name) {
+   ////     //set previous move status to 0 so ther moves can move there.
+   ////     Manager.Instance.FindMoves(name);
+   //// }
+   
 }
