@@ -15,5 +15,4 @@ public class Wall : MonoBehaviour
             g3.GetComponent<DragDrop>().EveryWallGottiStatus(g3.GetComponent<PhotonView>().ViewID, true);
         }
     }
-
 }

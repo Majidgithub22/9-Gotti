@@ -36,5 +36,4 @@ public class Slot : MonoBehaviour
    ////     //set previous move status to 0 so ther moves can move there.
    ////     Manager.Instance.FindMoves(name);
    //// }
-   
 }
