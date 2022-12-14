@@ -8,6 +8,7 @@ TagManager:
   - Pillar
   - Wall
   - Wall1
+  - cube
   layers:
   - Default
   - TransparentFX

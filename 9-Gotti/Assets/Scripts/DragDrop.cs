@@ -16,21 +16,23 @@ public class DragDrop : MonoBehaviour {
     private Vector3 startPos;
     private bool isDragging = false;
     private PhotonView photonView;
-    private List<GameObject> list = new List<GameObject>();
+    public List<GameObject> list = new List<GameObject>();
+    public bool isTouch=true;//can we touch player if game is started else no
     private void Start() {
         myCam = Manager.Instance.Camera;
         photonView = GetComponent<PhotonView>();
+        Manager.Instance.EmptyMoves();//Count empty moves.
     }
     private void Update() {
         if (photonView.IsMine && Manager.Instance.isSpawn) {
             if (isDragging) { DragObject(); }
         }
     }
-    private void OnMouseDown() {
-        if (photonView.IsMine) {
+    public void OnMouseDown() {
+        if (photonView.IsMine&&isTouch) {
             startPos = gameObject.transform.localPosition;
             Vector3 mousePos = Input.mousePosition;
-            if (Manager.Instance.play) { asd(); }
+            if (Manager.Instance.play) { ShowNeigbourMoves(); }
             if (!myCam.orthographic) {
                 mousePos.z = 10;
             }
@@ -39,18 +41,21 @@ public class DragDrop : MonoBehaviour {
             startZPos = mousePos.z - transform.position.z;
             isDragging = true;
         } else {
+           Manager.Instance. playerNames[3].text = "in else";
             if (Manager.Instance.isLineFormed) {
-                if (!gameObject.GetComponent<DragDrop>().isDestroyable) {
-                    photonView.RPC("DestroyPlayerRPC", RpcTarget.All, gameObject.GetComponent<PhotonView>().ViewID);
+                Manager.Instance.playerNames[3].text = "line formed";
+                if (!gameObject.GetComponent<DragDrop>().isDestroyable&& !gameObject.GetComponent<DragDrop>().isTouch) {//touch is for don't destroy gotti that is not moves yet to place.
+                    Manager.Instance.playerNames[3].text = "destroying player";
+                    photonView.RPC("DestroyPlayerRPC", RpcTarget.AllBuffered, gameObject.GetComponent<PhotonView>().ViewID);
                     Manager.Instance.isLineFormed = false;
                 }
             }
         }
     }
-    private void OnMouseUp() {
-        if (photonView.IsMine) {
+    public void OnMouseUp() {
+        if (photonView.IsMine&&isTouch) {
             isDragging = false;
-            // Manager.Instance.EnableWallColliders();
+            Manager.Instance.playerNames[3].text = "name "+gameObject.name;
             foreach (GameObject obj in list) {//sizing the nearby pillars down.Only they are in list
                 SizeDown(obj);
             }
@@ -59,15 +64,13 @@ public class DragDrop : MonoBehaviour {
             } else {
                 if (temparent != null) {//checking if new parent is there
                     if (parent != null) {//if parent is there mean not assigning for 1st time
-                        photonView.RPC("UpdateStatus", RpcTarget.All,parent.name, 0);//set status of previous parent to 0, Making it RPC
-                        photonView.RPC("DisableParentMesh",RpcTarget.All, parent.name, true);//set status of previous parent to 0, Making it RPC
+                        photonView.RPC("SetParentMesh",RpcTarget.All, parent.name, true,0);//set status of previous parent to 0, Making it RPC
                     }
                     parent = temparent;//new parent assigned
                 }
-               // gameObject.GetComponent<DragDrop>().enabled = false;
-                photonView.RPC("DisableParentMesh",RpcTarget.All, parent.name, false);//set status of previous parent to 0, Making it RPC
                 transform.position = parent.transform.position;//
-                parent.GetComponent<MeshRenderer>().enabled = false;
+                photonView.RPC("SetIsTouch", RpcTarget.All, gameObject.GetComponent<PhotonView>().ViewID, false);//isTouch = false;//can not touch until all gotti placed.
+                photonView.RPC("SetParentMesh",RpcTarget.All, parent.name, false,1);//set status of previous parent to 0, Making it RPC
                 Manager.Instance.playerNames[0].text = transform.position + "";
                 if (wall != null) { CheckPreviousParent(wall); }
                 if (wall1 != null) { CheckPreviousParent(wall1); }
@@ -78,9 +81,9 @@ public class DragDrop : MonoBehaviour {
                 isSet = false;
                 Manager.Instance.WallGottiCheck();
                 photonView.RPC("UpdatePlaceCount", RpcTarget.All);//again enable drag drop
+                Manager.Instance.EmptyMoves();//Count empty moves.
             }
         } 
-        
     }
     public void DragObject() {
         Vector3 mousePos = Input.mousePosition;
@@ -90,7 +93,7 @@ public class DragDrop : MonoBehaviour {
         mousePos = myCam.ScreenToWorldPoint(mousePos);
         transform.position = new Vector3(mousePos.x - startXPos, transform.position.y, mousePos.z - startZPos); //*Time.deltaTime*speed;
     }
-    private void asd() {
+    private void ShowNeigbourMoves() {
         Manager.Instance.DisableMoves();// Disale every pillar collider
         for (int i = 0; i < parent.GetComponent<Slot>().moves.Length; i++)
             if (parent.GetComponent<Slot>().moves[i].GetComponent<Slot>().status == 0) {//checking if parent pillar neihbour moves are free add them to list
@@ -100,10 +103,27 @@ public class DragDrop : MonoBehaviour {
             }
     }
     private void SizeUP(GameObject obj) {
-        obj.transform.localScale = new Vector3(25f, 5, 25f);
+        obj.transform.localScale = new Vector3(28f, 5, 28f);
     }
     private void SizeDown(GameObject obj) {
         obj.transform.localScale = new Vector3(20, 5, 20);
+    }
+    private void SizeUpDestroyableOpponents() {
+        List<GameObject> destPlayers = Manager.Instance.GetListOfDestroyablePlayers();
+        foreach (GameObject p in destPlayers) {
+            SizeUP(p);
+        }
+    }
+    public void SizeDownDestroyableOpponents() {
+        List<GameObject> destPlayers = Manager.Instance.GetListOfDestroyablePlayers();
+        foreach (GameObject p in destPlayers) {
+            SizeDown(p);
+        }
+        //destroy player if not destroyed yet.
+        if (Manager.Instance.isLineFormed) {
+            photonView.RPC("DestroyPlayerRPC", RpcTarget.AllBuffered,destPlayers[0].GetComponent<PhotonView>().ViewID);
+        }
+        Manager.Instance.isLineFormed = false;
     }
     private void checkSibling(GameObject wall) {
         if (!wall.GetComponent<Wall>().p1 && !wall.GetComponent<Wall>().p2 && !wall.GetComponent<Wall>().p3) {
@@ -124,7 +144,8 @@ public class DragDrop : MonoBehaviour {
                     photonView.RPC("UpdatePlayerStatus", RpcTarget.All, wall.GetComponent<Wall>().g1.GetComponent<PhotonView>().ViewID, true);
                     photonView.RPC("UpdatePlayerStatus", RpcTarget.All, wall.GetComponent<Wall>().g2.GetComponent<PhotonView>().ViewID,true);
                     photonView.RPC("UpdatePlayerStatus", RpcTarget.All, wall.GetComponent<Wall>().g3.GetComponent<PhotonView>().ViewID, true);
-                Manager.Instance.isLineFormed = true;
+                    Manager.Instance.isLineFormed = true;
+                    SizeUpDestroyableOpponents();
             }
         }
     }
@@ -157,21 +178,20 @@ public class DragDrop : MonoBehaviour {
     }
     #region RPC_Calls
     [PunRPC]
-    private void UpdateStatus(string name,int status) {
-        //set previous move status to 0 so ther moves can move there.
-        Manager.Instance.SetPillarStatus(name,status);
-    }
-    [PunRPC]
     private void UpdatePlaceCount() {
         Manager.Instance.PlacePlayers();//again enable drag drop
+    }
+    [PunRPC]
+    private void SetIsTouch(int id,bool stat) {
+        Manager.Instance.PlayerIsTouch(id,stat);//again enable drag drop
     }
     [PunRPC]
     private void UpdatePlayerStatus(int id, bool isdestry) {
         Manager.Instance.PlayerDestroyStatus(id, isdestry);
     }
     [PunRPC]
-    private void DisableParentMesh(string name, bool isEnable) {
-        Manager.Instance.SetParentMesh(name, isEnable);
+    private void SetParentMesh(string name, bool isEnable,int n) {
+        Manager.Instance.SetParentMesh(name, isEnable,n);
     }
     [PunRPC]
     private void DestroyPlayerRPC(int id) {

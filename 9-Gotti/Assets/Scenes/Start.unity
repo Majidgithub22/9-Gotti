@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.44657844, g: 0.49641222, b: 0.57481694, a: 1}
+  m_IndirectSpecularColor: {r: 0.44657868, g: 0.49641263, b: 0.57481706, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -722,6 +722,7 @@ GameObject:
   - component: {fileID: 649881055516442458}
   - component: {fileID: 9210824159738628640}
   - component: {fileID: 422085180694306061}
+  - component: {fileID: 422085180694306062}
   m_Layer: 5
   m_Name: ConnectingScreen
   m_TagString: Untagged
@@ -744,6 +745,28 @@ MonoBehaviour:
   session: {fileID: 11400000, guid: fad1b27502eb580419901f8792e88906, type: 2}
   serverSettings: {fileID: 11400000, guid: a91df590abbb851468500006da7a7d26, type: 2}
   displayInfo: {fileID: 1825557634670823141}
+--- !u!114 &422085180694306062
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 422085180694306060}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aa584fbee541324448dd18d8409c7a41, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ObservedComponentsFoldoutOpen: 1
+  Group: 0
+  prefixField: -1
+  Synchronization: 3
+  OwnershipTransfer: 0
+  observableSearch: 2
+  ObservedComponents: []
+  sceneViewId: 1
+  InstantiationId: 0
+  isRuntimeInstantiated: 0
 --- !u!1 &426395797404165381
 GameObject:
   m_ObjectHideFlags: 0
