@@ -68,8 +68,6 @@ public class TestConnect : MonoBehaviourPunCallbacks {
         }
 
     public override void OnDisconnected(DisconnectCause cause) {
-        // info.text = "disconnceted from server for reason " + cause.ToString();
-        // Debug.Log("disconnceted from server for reason " + cause.ToString());
     }
     [PunRPC]
     private void PlayerCount() {

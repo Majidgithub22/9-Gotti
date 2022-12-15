@@ -19,6 +19,7 @@ public class Manager : Singleton<Manager> {
     private PhotonView photonView;
     public bool isLineFormed;
     public bool isP1Turn = true;
+    public bool takeTurn;
     private GameObject Player1, Player2;
     List<GameObject> destroyableOpponent = new List<GameObject>();
 
@@ -32,33 +33,43 @@ public class Manager : Singleton<Manager> {
     #region PlayerFunctions
     //DisplayTime for each player
     public void DisplayUserTime() {
-        if (PhotonNetwork.IsMasterClient && isP1Turn) {
+        if (PhotonNetwork.IsMasterClient && isP1Turn&&!play) {
             isSpawn = true;
            Player1= PhotonNetwork.Instantiate("Player1", new Vector3(p1X, p1Y, p1Z), Quaternion.identity);
             StartCoroutine(DisplayTime(false,Player1,true));
-            Player1.GetComponent<DragDrop>().SizeDownDestroyableOpponents();
-        } else if (!isP1Turn && !PhotonNetwork.IsMasterClient) {
+        } else if (!isP1Turn && !PhotonNetwork.IsMasterClient&&!play) {
             isSpawn = true;
            Player2= PhotonNetwork.Instantiate("Player2", new Vector3(p2X, p2Y, p2Z), Quaternion.identity);
             StartCoroutine(DisplayTime(true,Player2,false));
-            Player1.GetComponent<DragDrop>().SizeDownDestroyableOpponents();
         }
+        //if (play) {
+        //    //update players status to true
+        //    EnablePlayerTouch(true);
+        //}
     }
     //Check Player  count
 
     public void PlacePlayers() {
         placePlayerCount++;
+        playerNames[3].text = placePlayerCount.ToString();
         if (placePlayerCount >= 18) {// If player is in room.
             EnableDragDrop();
             play = true;
         }
     }
-  
+
     //Enable drag drp for each player.
     public void EnableDragDrop() {
         GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
         foreach (GameObject p in players) {
             p.GetComponent<DragDrop>().enabled = true;
+        }
+    }
+    public void EnablePlayerTouch(bool t) {
+        GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
+        foreach (GameObject p in players) {
+            if(p.GetComponent<PhotonView>().IsMine)
+            p.GetComponent<DragDrop>().isTouch = t;
         }
     }
     //Update player destroyable status
@@ -92,7 +103,7 @@ public class Manager : Singleton<Manager> {
         }
     }
     public List<GameObject> GetListOfDestroyablePlayers() {
-        destroyableOpponent.Clear();
+       // destroyableOpponent.Clear();
         GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
         foreach (GameObject p in players) {
             if (!p.GetComponent<PhotonView>().IsMine&&!p.GetComponent<DragDrop>().isDestroyable) {
@@ -192,6 +203,8 @@ public class Manager : Singleton<Manager> {
         } else if(player.GetComponent<DragDrop>().isTouch && !isPlayer1) {
             photonView.RPC("MovePlayerAutomatically", RpcTarget.All, false);
         }
+        if(isPlayer1) Player1.GetComponent<DragDrop>().SizeDownDestroyableOpponents();
+        else Player2.GetComponent<DragDrop>().SizeDownDestroyableOpponents();
         isSpawn = false;
         photonView.RPC("SetMyTurn",RpcTarget.All, isTurn);
     }
