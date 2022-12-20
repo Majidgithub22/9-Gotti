@@ -120,6 +120,8 @@ MonoBehaviour:
   temparent: {fileID: 0}
   isSet: 0
   isDestroyable: 0
+  list: []
+  isTouch: 1
 --- !u!54 &3039593359767747669
 Rigidbody:
   m_ObjectHideFlags: 0

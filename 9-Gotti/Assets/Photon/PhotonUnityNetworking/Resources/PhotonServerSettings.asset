@@ -19,7 +19,7 @@ MonoBehaviour:
     AppIdVoice: 
     AppVersion: 1
     UseNameServer: 1
-    FixedRegion: 
+    FixedRegion: us
     Server: 
     Port: 0
     ProxyServer: 
@@ -35,26 +35,24 @@ MonoBehaviour:
   StartInOfflineMode: 0
   RpcList:
   - ClickRpc
+  - DestroyPlayerRPC
   - DestroyRpc
   - DestroySpaceship
   - Fire
+  - MovePlayerAutomatically
+  - PlayerCount
   - RespawnSpaceship
-  - UpdateParentStatus
-  - UpdateStatus
+  - SetIsTouch
+  - SetMyTurn
+  - SetParentMesh
+  - SetParentMeshRPC
+  - SetWalls
   - showName
-  - StartGame
+  - ShowTime
   - UpdatePlaceCount
   - UpdatePlayerStatus
-  - SetMyTurn
-  - ShowTime
-  - PlacePlayers
-  - DisableParentMesh
-  - DestroyPlayerRPC
-  - SetParentMeshRPC
-  - SetParentMesh
-  - PlayerCount
-  - SetIsTouch
-  - MovePlayerAutomatically
+  - MovePlayerAfterPlay
+  - SetMyTurnPlay
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 1

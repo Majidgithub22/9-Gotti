@@ -41,18 +41,9 @@ public class DragDrop : MonoBehaviour {
             startZPos = mousePos.z - transform.position.z;
             isDragging = true;
         } else {
-           Manager.Instance. playerNames[3].text = "in else";
             if (Manager.Instance.isLineFormed) {
-                Manager.Instance.playerNames[3].text = "line formed";
                 if (!gameObject.GetComponent<DragDrop>().isDestroyable&& !gameObject.GetComponent<DragDrop>().isTouch) {//touch is for don't destroy gotti that is not m
-                    Manager.Instance.playerNames[3].text = "destroying player";
-                    //update  parent and walls
-                    if (wall != null) { CheckPreviousParent(wall); }
-                    if (wall1 != null) { CheckPreviousParent(wall1); }
-                    if (parent != null) {//if parent is there mean not assigning for 1st time
-                        photonView.RPC("SetParentMesh", RpcTarget.All, parent.name, true, 0);//set status of previous parent to 0, Making it RPC
-                    }
-                    photonView.RPC("DestroyPlayerRPC", RpcTarget.AllBuffered, gameObject.GetComponent<PhotonView>().ViewID);
+                    photonView.RPC("DestroyPlayerRPC", RpcTarget.All, gameObject.GetComponent<PhotonView>().ViewID);
                     Manager.Instance.isLineFormed = false;
                 }
             }
@@ -70,25 +61,26 @@ public class DragDrop : MonoBehaviour {
             } else {
                 if (temparent != null) {//checking if new parent is there
                     if (parent != null) {//if parent is there mean not assigning for 1st time
-                        photonView.RPC("SetParentMesh",RpcTarget.All, parent.name, true,0);//set status of previous parent to 0, Making it RPC
+                        photonView.RPC("SetParentMesh",RpcTarget.All, parent.name,gameObject.GetComponent<PhotonView>().ViewID, true,0,false);//set status of previous parent to 0, Making it RPC
                     }
                     parent = temparent;//new parent assigned
                 }
+                //MoveGotttiOnlyOnce
+                if (Manager.Instance.play) {
+                    Manager.Instance.DisableGottiMoveAfterPlay();//it should disable other gootiis to move
+                }
+                if (wall != null && wall != parent.GetComponent<Slot>().wall) { CheckPreviousParent(wall); }
+                if (wall1 != null && wall != parent.GetComponent<Slot>().wall) { CheckPreviousParent(wall1); }
                 transform.position = parent.transform.position;//
                 photonView.RPC("SetIsTouch", RpcTarget.All, gameObject.GetComponent<PhotonView>().ViewID, false);//isTouch = false;//can not touch until all gotti placed.
-                photonView.RPC("SetParentMesh",RpcTarget.All, parent.name, false,1);//set status of previous parent to 0, Making it RPC
+                photonView.RPC("SetParentMesh",RpcTarget.All, parent.name, gameObject.GetComponent<PhotonView>().ViewID, false,1,true);//set status of  parent to 1, Making it RPC
                 Manager.Instance.playerNames[0].text = transform.position + "";
-                if (wall != null) { CheckPreviousParent(wall); }
-                if (wall1 != null) { CheckPreviousParent(wall1); }
-                wall = parent.GetComponent<Slot>().wall;
-                wall1 = parent.GetComponent<Slot>().wall1;
-                checkSibling(parent.GetComponent<Slot>().wall);
-                checkSibling(parent.GetComponent<Slot>().wall1);
+                checkSibling(wall);
+                checkSibling(wall1);
                 isSet = false;
                 Manager.Instance.WallGottiCheck();
                 photonView.RPC("UpdatePlaceCount", RpcTarget.All);//again enable drag drop
                 Manager.Instance.EmptyMoves();//Count empty moves.
-              //  Manager.Instance.EnablePlayerTouch(false);
             }
         } 
     }
@@ -116,26 +108,39 @@ public class DragDrop : MonoBehaviour {
         obj.transform.localScale = new Vector3(20, 5, 20);
     }
     private void SizeUpDestroyableOpponents() {
-        List<GameObject> destPlayers = Manager.Instance.GetListOfDestroyablePlayers();
-        foreach (GameObject p in destPlayers) {
-            SizeUP(p);
+        Manager.Instance.GetListOfDestroyablePlayers();
+        List<GameObject> destPlayers = new List<GameObject>();
+        //get list first
+        for(int i=0;i < Manager.Instance.destroyableOpponent.Count; i++) {
+            destPlayers.Add(Manager.Instance.destroyableOpponent[i]);
+        }
+        Manager.Instance.playerNames[1].text = "size up"+destPlayers.Count;
+        for (int i = 0; i < Manager.Instance.destroyableOpponent.Count; i++) {
+            SizeUP(destPlayers[i].gameObject);
         }
     }
     public void SizeDownDestroyableOpponents() {
-        List<GameObject> destPlayers = Manager.Instance.GetListOfDestroyablePlayers();
-        foreach (GameObject p in destPlayers) {
-            SizeDown(p);
-        }
-        //destroy player if not destroyed yet.
-        if (Manager.Instance.isLineFormed) {
-            if (destPlayers[0].GetComponent<DragDrop>().wall != null) { CheckPreviousParent(destPlayers[0].GetComponent<DragDrop>().wall); }
-            if (destPlayers[0].GetComponent<DragDrop>().wall1 != null) { CheckPreviousParent(destPlayers[0].GetComponent<DragDrop>().wall1); }
-            if (wall1 != null) { CheckPreviousParent(wall1); }
-            photonView.RPC("SetParentMesh", RpcTarget.All, destPlayers[0].GetComponent<DragDrop>().parent.name, true, 0);//set status of  parent to 0, Making it RPC
-            photonView.RPC("DestroyPlayerRPC", RpcTarget.AllBuffered,destPlayers[0].GetComponent<PhotonView>().ViewID);
-        }
-        Manager.Instance.isLineFormed = false;
-        destPlayers.Clear();
+        Manager.Instance.GetListOfDestroyablePlayers();
+        List<GameObject> destPlayers = new List<GameObject>();
+        //get list first
+       // if (Manager.Instance.destroyableOpponent.Count > 0) {
+            for (int i = 0; i < Manager.Instance.destroyableOpponent.Count; i++) {
+                destPlayers.Add(Manager.Instance.destroyableOpponent[i]);
+            }
+            Manager.Instance.playerNames[3].text = "sizedow" + destPlayers.Count;
+            for (int i = 0; i < Manager.Instance.destroyableOpponent.Count; i++) {
+                SizeDown(destPlayers[i].gameObject);
+            }
+            Manager.Instance.playerNames[3].text = "marasi chly gae" + destPlayers.Count;
+            //destroy player if not destroyed yet.
+            if (Manager.Instance.isLineFormed) {
+                Manager.Instance.playerNames[3].text = "line is formed";
+                photonView.RPC("DestroyPlayerRPC", RpcTarget.AllBuffered, destPlayers[0].GetComponent<PhotonView>().ViewID);
+            }
+            Manager.Instance.isLineFormed = false;
+            destPlayers.Clear();
+            Manager.Instance.playerNames[3].text = "listclear";
+      //  }
     }
     private void checkSibling(GameObject wall) {
         if (!wall.GetComponent<Wall>().p1 && !wall.GetComponent<Wall>().p2 && !wall.GetComponent<Wall>().p3) {
@@ -143,7 +148,7 @@ public class DragDrop : MonoBehaviour {
             wall.GetComponent<Wall>().p1 = true;
         } else if (wall.GetComponent<Wall>().p1 && !wall.GetComponent<Wall>().p2 && !wall.GetComponent<Wall>().p3) {
          //   if (wall.GetComponent<Wall>().g1.GetComponent<PhotonView>().ViewID != gameObject.GetComponent<PhotonView>().ViewID) {
-                Debug.Log("I am activating for p2 " + wall);
+              //  Debug.Log("I am activating for p2 " + wall);
                 wall.GetComponent<Wall>().g2 = gameObject;
                 wall.GetComponent<Wall>().p2 = true;
            // }
@@ -161,23 +166,19 @@ public class DragDrop : MonoBehaviour {
             }
         }
     }
-    private void CheckPreviousParent(GameObject wall) {
+    public void CheckPreviousParent(GameObject wall) {
         //if parent have p1 but no p2 and p3.
         if (wall.GetComponent<Wall>().p1 && !wall.GetComponent<Wall>().p2 && !wall.GetComponent<Wall>().p3) {
             wall.GetComponent<Wall>().g1 = null;
             wall.GetComponent<Wall>().p1 = false;
-            //photonView.RPC("UpdatePlayerStatus", RpcTarget.All, wall.GetComponent<Wall>().g1.GetComponent<PhotonView>().ViewID, false);
             Debug.Log("I am dactivating for p1 " + wall);
-            //if parent have p1 ,p2but no  p3.
-        } else if (wall.GetComponent<Wall>().p1 && wall.GetComponent<Wall>().p2 && !wall.GetComponent<Wall>().p3) {
+        }
+        else if (wall.GetComponent<Wall>().p1 && wall.GetComponent<Wall>().p2 && !wall.GetComponent<Wall>().p3) {
             wall.GetComponent<Wall>().g2 = null;
             wall.GetComponent<Wall>().p2 = false;
-            //photonView.RPC("UpdatePlayerStatus", RpcTarget.All, wall.GetComponent<Wall>().g1.GetComponent<PhotonView>().ViewID, false);
-            //photonView.RPC("UpdatePlayerStatus", RpcTarget.All, wall.GetComponent<Wall>().g2.GetComponent<PhotonView>().ViewID, false);
             Debug.Log("I am dactivating for p2 " + wall);
-            //if parent have p1, p2,and p3
-        } else if (wall.GetComponent<Wall>().p1 && wall.GetComponent<Wall>().p2 && wall.GetComponent<Wall>().p3) {
-           
+        } 
+        else if (wall.GetComponent<Wall>().p1 && wall.GetComponent<Wall>().p2 && wall.GetComponent<Wall>().p3) {
             //Now check if wall all 3 are complete// if my line
             if (wall.GetComponent<Wall>().g1.GetComponent<PhotonView>().IsMine&& wall.GetComponent<Wall>().g2.GetComponent<PhotonView>().IsMine&& wall.GetComponent<Wall>().g3.GetComponent<PhotonView>().IsMine) {
                 photonView.RPC("UpdatePlayerStatus", RpcTarget.All, wall.GetComponent<Wall>().g1.GetComponent<PhotonView>().ViewID,false); 
@@ -190,23 +191,30 @@ public class DragDrop : MonoBehaviour {
     }
     #region RPC_Calls
     [PunRPC]
+    private void SetWalls(string wall1,string wall2,int id) {
+        Manager.Instance.SetWalls(wall1,wall2,id);
+    }
+    [PunRPC]
     private void UpdatePlaceCount() {
         Manager.Instance.PlacePlayers();//again enable drag drop
     }
+    
     [PunRPC]
-    private void SetIsTouch(int id,bool stat) {
-        Manager.Instance.PlayerIsTouch(id,stat);//again enable drag drop
+    private void SetIsTouch(int id, bool stat) {
+        Manager.Instance.PlayerIsTouch(id, stat);//again enable drag drop
     }
+ 
     [PunRPC]
     private void UpdatePlayerStatus(int id, bool isdestry) {
         Manager.Instance.PlayerDestroyStatus(id, isdestry);
     }
     [PunRPC]
-    private void SetParentMesh(string name, bool isEnable,int n) {
-        Manager.Instance.SetParentMesh(name, isEnable,n);
+    private void SetParentMesh(string name,int id, bool isEnable,int n,bool isSet) {
+        Manager.Instance.SetParentMesh(name,id, isEnable,n,isSet);
     }
     [PunRPC]
     private void DestroyPlayerRPC(int id) {
+    //    Manager.Instance.playerNames[0].text = "callind";
         Manager.Instance.DestroyPlayer(id);
     }
     #endregion RPC_Calls
