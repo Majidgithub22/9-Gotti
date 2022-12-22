@@ -67,6 +67,7 @@ public class DragDrop : MonoBehaviour {
                 }
                 //MoveGotttiOnlyOnce
                 if (Manager.Instance.play) {
+                       Debug.Log("DISABLE");
                     Manager.Instance.DisableGottiMoveAfterPlay();//it should disable other gootiis to move
                 }
                 if (wall != null && wall != parent.GetComponent<Slot>().wall) { CheckPreviousParent(wall); }
@@ -123,24 +124,29 @@ public class DragDrop : MonoBehaviour {
         Manager.Instance.GetListOfDestroyablePlayers();
         List<GameObject> destPlayers = new List<GameObject>();
         //get list first
-       // if (Manager.Instance.destroyableOpponent.Count > 0) {
+        if (Manager.Instance.destroyableOpponent.Count > 0) {
             for (int i = 0; i < Manager.Instance.destroyableOpponent.Count; i++) {
                 destPlayers.Add(Manager.Instance.destroyableOpponent[i]);
             }
-            Manager.Instance.playerNames[3].text = "sizedow" + destPlayers.Count;
+           // Manager.Instance.playerNames[3].text = "sizedow" + destPlayers.Count;
             for (int i = 0; i < Manager.Instance.destroyableOpponent.Count; i++) {
                 SizeDown(destPlayers[i].gameObject);
             }
-            Manager.Instance.playerNames[3].text = "marasi chly gae" + destPlayers.Count;
+            //Manager.Instance.playerNames[3].text = "marasi chly gae" + destPlayers.Count;
             //destroy player if not destroyed yet.
             if (Manager.Instance.isLineFormed) {
                 Manager.Instance.playerNames[3].text = "line is formed";
                 photonView.RPC("DestroyPlayerRPC", RpcTarget.AllBuffered, destPlayers[0].GetComponent<PhotonView>().ViewID);
+                destPlayers.RemoveAt(0);
             }
-            Manager.Instance.isLineFormed = false;
+        
+        Manager.Instance.isLineFormed = false;
             destPlayers.Clear();
             Manager.Instance.playerNames[3].text = "listclear";
-      //  }
+      //  if(Manager.Instance.waltext.GetComponent<Wall>().g1!=null)
+      //Debug.Log("2+"+  Manager.Instance.waltext.GetComponent<Wall>().g1.name);
+      //  else { Debug.Log("1null"); }
+       }
     }
     private void checkSibling(GameObject wall) {
         if (!wall.GetComponent<Wall>().p1 && !wall.GetComponent<Wall>().p2 && !wall.GetComponent<Wall>().p3) {
@@ -166,7 +172,51 @@ public class DragDrop : MonoBehaviour {
             }
         }
     }
+    public void CheckPreviousParentDest(GameObject wall, int id) {
+        GameObject obj = null; bool isP1 = false;
+        //First get our passed player
+        GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
+        foreach (GameObject p in players) {
+            if (p.GetComponent<PhotonView>().ViewID == id) {
+                obj = p;
+            }
+        }
+            //if p1 is not null then check if p is first child of wall
+            if (wall.GetComponent<Wall>().p1) {
+                if (obj.GetComponent<PhotonView>().ViewID == wall.GetComponent<Wall>().g1.GetComponent<PhotonView>().ViewID) {
+                    isP1 = true;
+                }
+            }//if p2 is not null then check if p is 2nd child of wall
+            if (wall.GetComponent<Wall>().p2) {
+                if (obj.GetComponent<PhotonView>().ViewID == wall.GetComponent<Wall>().g2.GetComponent<PhotonView>().ViewID) {
+                    isP1 = false;
+                }
+            }
+            if (isP1) {
+                wall.GetComponent<Wall>().g1 = wall.GetComponent<Wall>().g2;
+            }
+            //if parent have p1 but no p2 and p3.
+            if (wall.GetComponent<Wall>().p1 && !wall.GetComponent<Wall>().p2 && !wall.GetComponent<Wall>().p3) {
+                wall.GetComponent<Wall>().g1 = null;
+                wall.GetComponent<Wall>().p1 = false;
+         //       Debug.Log("I am dactivating for p1 " + wall);
+            } else if (wall.GetComponent<Wall>().p1 && wall.GetComponent<Wall>().p2 && !wall.GetComponent<Wall>().p3) {
+                wall.GetComponent<Wall>().g2 = null;
+                wall.GetComponent<Wall>().p2 = false;
+           //     Debug.Log("I am dactivating for p2 " + wall);
+            } else if (wall.GetComponent<Wall>().p1 && wall.GetComponent<Wall>().p2 && wall.GetComponent<Wall>().p3) {
+                //Now check if wall all 3 are complete// if my line
+                if (wall.GetComponent<Wall>().g1.GetComponent<PhotonView>().IsMine && wall.GetComponent<Wall>().g2.GetComponent<PhotonView>().IsMine && wall.GetComponent<Wall>().g3.GetComponent<PhotonView>().IsMine) {
+                    photonView.RPC("UpdatePlayerStatus", RpcTarget.All, wall.GetComponent<Wall>().g1.GetComponent<PhotonView>().ViewID, false);
+                    photonView.RPC("UpdatePlayerStatus", RpcTarget.All, wall.GetComponent<Wall>().g2.GetComponent<PhotonView>().ViewID, false);
+                    photonView.RPC("UpdatePlayerStatus", RpcTarget.All, wall.GetComponent<Wall>().g3.GetComponent<PhotonView>().ViewID, false);
+                }
+                wall.GetComponent<Wall>().g3 = null;
+                wall.GetComponent<Wall>().p3 = false;
+            }
+    }
     public void CheckPreviousParent(GameObject wall) {
+
         //if parent have p1 but no p2 and p3.
         if (wall.GetComponent<Wall>().p1 && !wall.GetComponent<Wall>().p2 && !wall.GetComponent<Wall>().p3) {
             wall.GetComponent<Wall>().g1 = null;
@@ -189,10 +239,11 @@ public class DragDrop : MonoBehaviour {
             wall.GetComponent<Wall>().p3 = false;
         }
     }
+   
     #region RPC_Calls
     [PunRPC]
-    private void SetWalls(string wall1,string wall2,int id) {
-        Manager.Instance.SetWalls(wall1,wall2,id);
+    private void SetWalls(string wallName,string p) {
+       // Manager.Instance.SetWalls(wall1,wall2,id);
     }
     [PunRPC]
     private void UpdatePlaceCount() {

@@ -21,6 +21,7 @@ public class Manager : Singleton<Manager> {
     public bool isP1Turn = true;
     public bool takeTurn;
     public bool only1Move;
+    public GameObject waltext;
     private GameObject Player1, Player2;
     public List<GameObject> destroyableOpponent = new List<GameObject>();
     private void Start() {
@@ -44,18 +45,11 @@ public class Manager : Singleton<Manager> {
                 StartCoroutine(DisplayTime(true, Player2));
             }
         } else {
-        EnableGottiMoveAfterPlay();
-        isP1Turn = true;
-        DisplayUserMoves();
+            //Call player for the first time aftyer play
+            photonView.RPC("SetTurns", RpcTarget.Others, true);
         }
     }
-    public void DisplayUserMoves() {
-        if (isP1Turn) {
-            StartCoroutine(MoveGottiPlay(true));
-        } else if (!isP1Turn) {
-            StartCoroutine(MoveGottiPlay(false));
-        }
-    }
+  
     //Check Player  count
     public void PlacePlayers() {
         placePlayerCount++;
@@ -81,6 +75,7 @@ public class Manager : Singleton<Manager> {
             }
         }
         only1Move = true;
+        isSpawn = true;
     }
     public void DisableGottiMoveAfterPlay() {
         GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
@@ -118,20 +113,27 @@ public class Manager : Singleton<Manager> {
         }
     }
     public void DestroyPlayer(int id) {
+        bool found=false;
         GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
         foreach (GameObject p in players) {
             if (p.GetComponent<PhotonView>().ViewID == id) {
                 p.GetComponent<DragDrop>().parent.GetComponent<Slot>().status = 0;
                 p.GetComponent<DragDrop>().parent.GetComponent<MeshRenderer>().enabled = true;
-                playerNames[3].text = "" + p.GetComponent<DragDrop>().wall;
+             //   playerNames[3].text = "" + p.GetComponent<DragDrop>().wall;
                 if (p.GetComponent<PhotonView>().IsMine) {
-                    p.GetComponent<DragDrop>().CheckPreviousParent(p.GetComponent<DragDrop>().wall);
-                    p.GetComponent<DragDrop>().CheckPreviousParent(p.GetComponent<DragDrop>().wall1);
+                    p.GetComponent<DragDrop>().CheckPreviousParentDest(p.GetComponent<DragDrop>().wall, p.GetComponent<PhotonView>().ViewID);
+                    p.GetComponent<DragDrop>().CheckPreviousParentDest(p.GetComponent<DragDrop>().wall1, p.GetComponent<PhotonView>().ViewID);
                 }
-                playerNames[3].text = "After";
+                //playerNames[3].text = "";
+               // Debug.Log("wall p1" + p.GetComponent<DragDrop>().wall.GetComponent<Wall>().g1);
                 Destroy(p.gameObject);
+              //  Debug.Log("wall p1" + p.GetComponent<DragDrop>().wall.GetComponent<Wall>().g1);
                 playerNames[3].text = "done";
-                return;
+                found = true;
+               // Debug.Log("wall p1" + p.GetComponent<DragDrop>().wall.GetComponent<Wall>().g1);
+            }
+            if (found) {
+              break;
             }
         }
     }
@@ -160,8 +162,9 @@ public class Manager : Singleton<Manager> {
         }
         // playerNames[3].text = emptyMovesList.Count+"";
     }
-    GameObject prnt = null;
+   
     public void SetParentMesh(string movename, int id, bool isEnable, int n, bool isSetParent) {
+        GameObject prnt = null;
         foreach (GameObject m in moves) {
             if (m.name == movename) {
                 prnt = m;
@@ -183,7 +186,7 @@ public class Manager : Singleton<Manager> {
             }
         }
     }
-    GameObject desPrnt = null;
+    //GameObject desPrnt = null;
     public void SetParentFree(string parentName) {
         foreach (GameObject m in moves) {
             if (m.name == parentName) {
@@ -199,27 +202,7 @@ public class Manager : Singleton<Manager> {
             w.GetComponent<Wall>().SetGottiDestroyableStatus();
         }
     }
-    public void SetWalls(string wall, string wall1, int id) {
-        GameObject gottiWall = null, gottiWall1 = null;
-        foreach (GameObject w in walls) {
-            if (w.name == wall) {
-                gottiWall = w;
-            }
-            if (w.name == wall1) {
-                gottiWall1 = w;
-            }
-        }
-        GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
-        foreach (GameObject p in players) {
-            if (p.GetComponent<PhotonView>().ViewID == id) {
-                p.GetComponent<DragDrop>().wall = gottiWall;
-                p.GetComponent<DragDrop>().wall = gottiWall1;
-                playerNames[0].text = "wallssetMan";
-            }
-        }
-    }
-
-
+    
     #region RPC
 
     [PunRPC]
@@ -245,14 +228,21 @@ public class Manager : Singleton<Manager> {
         isP1Turn = isTurn;
         DisplayUserTime();
     }
-    [PunRPC]
-    private void SetMyTurnPlay(bool isTurn) {
-        isP1Turn = isTurn;
-        DisplayUserMoves();
-    }
+    //[PunRPC]
+    //private void SetMyTurnPlay(bool isTurn) {
+    //    isP1Turn = isTurn;
+    //    DisplayUserMoves();
+    //}
     [PunRPC]
     private void ShowTime(bool isTurn, int sec) {
         if (isTurn)
+            TimeText[1].text = sec.ToString();
+        else
+            TimeText[0].text = sec.ToString();
+    }
+    [PunRPC]
+    private void ShowTimeAfterPlay(bool isTurn, int sec) {
+        if (!isTurn)
             TimeText[1].text = sec.ToString();
         else
             TimeText[0].text = sec.ToString();
@@ -273,15 +263,19 @@ public class Manager : Singleton<Manager> {
     private void MovePlayerAfterPlay() {
         GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
         List<GameObject> movePlayer=new List<GameObject>();
+        movePlayer.Clear();
         foreach (GameObject p in players) {
             if (p.GetComponent<PhotonView>().IsMine) {
                 movePlayer.Add(p);
             }
         }
+        Debug.Log("move player count"+movePlayer.Count);
+        
         for(int i = 0; i < movePlayer.Count; i++) {
-            for(int j = 0; j < movePlayer[i].GetComponent<Slot>().moves.Length; j++) {
-                if (movePlayer[i].GetComponent<Slot>().moves[j].GetComponent<Slot>().status == 0) {
-                    movePlayer[i].GetComponent<DragDrop>().parent = movePlayer[i].GetComponent<Slot>().moves[j];
+            Debug.Log("MOVE SLOTS COUNTS" + movePlayer[i].GetComponent<Slot>().moves.Length);
+            for(int j = 0; j < movePlayer[i].GetComponent<DragDrop>().parent.GetComponent<Slot>().moves.Length; j++) {
+                if (movePlayer[i].GetComponent<DragDrop>().parent.GetComponent<Slot>().moves[j].GetComponent<Slot>().status == 0) {
+                    movePlayer[i].GetComponent<DragDrop>().parent = movePlayer[i].GetComponent<DragDrop>().parent.GetComponent<Slot>().moves[j];
                     movePlayer[i].GetComponent<DragDrop>().isSet = true;
                     movePlayer[i].GetComponent<DragDrop>().OnMouseUp();
                     movePlayer[i].GetComponent<DragDrop>().SizeDownDestroyableOpponents();
@@ -289,7 +283,6 @@ public class Manager : Singleton<Manager> {
                 }
             }
         }
-            
     }
     #endregion RPC
     #region Coroutines
@@ -308,21 +301,33 @@ public class Manager : Singleton<Manager> {
         isSpawn = false;
         photonView.RPC("SetMyTurn", RpcTarget.All, isTurn);
     }
+
+    [PunRPC]
+    private void SetTurns(bool pl) {
+        StartCoroutine(MoveGottiPlay(pl));
+    }
     IEnumerator MoveGottiPlay(bool P1) {
+        EnableGottiMoveAfterPlay();
+        //if (P1) { Debug.Log("first plater moving firt"); }
+        //else { Debug.Log("2nd plater moving "); }
         int i = 0;
         while (i < 10) {
             yield return new WaitForSeconds(1);
             i++;
-            photonView.RPC("ShowTime", RpcTarget.All,P1, i);
+            photonView.RPC("ShowTimeAfterPlay", RpcTarget.All,P1, i);
         }
         //it means player is not moved yet.
-        if (!only1Move) {
+        Debug.Log("oly move" + only1Move);
+        if (only1Move) {
             photonView.RPC("MovePlayerAfterPlay", RpcTarget.All);
         }//
         /////
         isSpawn = false;
         P1 = !P1;
-        photonView.RPC("SetMyTurnPlay", RpcTarget.All, P1);
+        Debug.Log("p1 reverse" + P1);
+        //  photonView.RPC("SetMyTurnPlay", RpcTarget.All, P1);
+        photonView.RPC("SetTurns", RpcTarget.Others, P1);
+
     }
 
     #endregion Coroutines
