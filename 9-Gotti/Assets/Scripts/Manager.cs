@@ -272,7 +272,7 @@ public class Manager : Singleton<Manager> {
         Debug.Log("move player count"+movePlayer.Count);
         
         for(int i = 0; i < movePlayer.Count; i++) {
-            Debug.Log("MOVE SLOTS COUNTS" + movePlayer[i].GetComponent<Slot>().moves.Length);
+        //    Debug.Log("MOVE SLOTS COUNTS" + movePlayer[i].GetComponent<Slot>().moves.Length);
             for(int j = 0; j < movePlayer[i].GetComponent<DragDrop>().parent.GetComponent<Slot>().moves.Length; j++) {
                 if (movePlayer[i].GetComponent<DragDrop>().parent.GetComponent<Slot>().moves[j].GetComponent<Slot>().status == 0) {
                     movePlayer[i].GetComponent<DragDrop>().parent = movePlayer[i].GetComponent<DragDrop>().parent.GetComponent<Slot>().moves[j];
