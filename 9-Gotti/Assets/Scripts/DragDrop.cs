@@ -63,15 +63,15 @@ public class DragDrop : MonoBehaviour {
                     if (parent != null) {//if parent is there mean not assigning for 1st time
                         photonView.RPC("SetParentMesh",RpcTarget.All, parent.name,gameObject.GetComponent<PhotonView>().ViewID, true,0,false);//set status of previous parent to 0, Making it RPC
                     }
-                    parent = temparent;//new parent assigned
                 }
                 //MoveGotttiOnlyOnce
                 if (Manager.Instance.play) {
-                       Debug.Log("DISABLE");
+                      // Debug.Log("DISABLE");
                     Manager.Instance.DisableGottiMoveAfterPlay();//it should disable other gootiis to move
                 }
-                if (wall != null && wall != parent.GetComponent<Slot>().wall) { CheckPreviousParent(wall); }
-                if (wall1 != null && wall != parent.GetComponent<Slot>().wall) { CheckPreviousParent(wall1); }
+                if (wall != null )/*&& wall != parent.GetComponent<Slot>().wall)*/ { CheckPreviousParent(wall); }
+                if (wall1 != null)/* && wall != parent.GetComponent<Slot>().wall) */{ CheckPreviousParent(wall1); }
+                    parent = temparent;//new parent assigned
                 transform.position = parent.transform.position;//
                 photonView.RPC("SetIsTouch", RpcTarget.All, gameObject.GetComponent<PhotonView>().ViewID, false);//isTouch = false;//can not touch until all gotti placed.
                 photonView.RPC("SetParentMesh",RpcTarget.All, parent.name, gameObject.GetComponent<PhotonView>().ViewID, false,1,true);//set status of  parent to 1, Making it RPC
@@ -221,12 +221,12 @@ public class DragDrop : MonoBehaviour {
         if (wall.GetComponent<Wall>().p1 && !wall.GetComponent<Wall>().p2 && !wall.GetComponent<Wall>().p3) {
             wall.GetComponent<Wall>().g1 = null;
             wall.GetComponent<Wall>().p1 = false;
-            Debug.Log("I am dactivating for p1 " + wall);
+            //Debug.Log("I am dactivating for p1 " + wall);
         }
         else if (wall.GetComponent<Wall>().p1 && wall.GetComponent<Wall>().p2 && !wall.GetComponent<Wall>().p3) {
             wall.GetComponent<Wall>().g2 = null;
             wall.GetComponent<Wall>().p2 = false;
-            Debug.Log("I am dactivating for p2 " + wall);
+            //Debug.Log("I am dactivating for p2 " + wall);
         } 
         else if (wall.GetComponent<Wall>().p1 && wall.GetComponent<Wall>().p2 && wall.GetComponent<Wall>().p3) {
             //Now check if wall all 3 are complete// if my line

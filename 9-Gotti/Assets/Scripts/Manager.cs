@@ -34,7 +34,8 @@ public class Manager : Singleton<Manager> {
     #region PlayerFunctions
     //DisplayTime for each player
     public void DisplayUserTime() {
-        if (!play) { 
+        if (!play) {
+            Debug.Log("i am in first mlve");
             if (PhotonNetwork.IsMasterClient && isP1Turn) {
                 isSpawn = true;
                 Player1 = PhotonNetwork.Instantiate("Player1", new Vector3(p1X, p1Y, p1Z), Quaternion.identity);
@@ -44,10 +45,11 @@ public class Manager : Singleton<Manager> {
                 Player2 = PhotonNetwork.Instantiate("Player2", new Vector3(p2X, p2Y, p2Z), Quaternion.identity);
                 StartCoroutine(DisplayTime(true, Player2));
             }
-        } else {
-            //Call player for the first time aftyer play
-            photonView.RPC("SetTurns", RpcTarget.Others, true);
-        }
+        } 
+        //else {
+        //    //Call player for the first time aftyer play
+        //    photonView.RPC("SetTurns", RpcTarget.Others, true);
+        //}
     }
   
     //Check Player  count
@@ -57,6 +59,7 @@ public class Manager : Singleton<Manager> {
             EnableDragDrop();
             play = true;
         }
+     ////   Debug.Log("PlaerCount" + placePlayerCount);
     }
     //Enable drag drp for each player.
     public void EnableDragDrop() {
@@ -160,7 +163,6 @@ public class Manager : Singleton<Manager> {
                 emptyMovesList.Add(m.gameObject);//add all free moves to list
             }
         }
-        // playerNames[3].text = emptyMovesList.Count+"";
     }
    
     public void SetParentMesh(string movename, int id, bool isEnable, int n, bool isSetParent) {
@@ -169,7 +171,6 @@ public class Manager : Singleton<Manager> {
             if (m.name == movename) {
                 prnt = m;
                 m.GetComponent<MeshRenderer>().enabled = isEnable;
-              //  Manager.Instance.playerNames[3].text = "machan mil";
                 m.GetComponent<Slot>().status = n;
             }
         }
@@ -180,8 +181,6 @@ public class Manager : Singleton<Manager> {
                     p.GetComponent<DragDrop>().parent = prnt;
                     p.GetComponent<DragDrop>().wall = prnt.GetComponent<Slot>().wall;
                     p.GetComponent<DragDrop>().wall1 = prnt.GetComponent<Slot>().wall1;
-                   // p.GetComponent<DragDrop>().parent = prnt;
-                  //  Manager.Instance.playerNames[3].text = "machan a age h";
                 }
             }
         }
@@ -253,13 +252,13 @@ public class Manager : Singleton<Manager> {
         GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
         foreach (GameObject p in players) {
             if (p.GetComponent<PhotonView>().ViewID == id) {
-                p.GetComponent<DragDrop>().parent = m;
+                p.GetComponent<DragDrop>().temparent = m;
                 p.GetComponent<DragDrop>().isSet = true;
                 p.GetComponent<DragDrop>().OnMouseUp();
             }
         }
     }
-    [PunRPC]
+//    [PunRPC]
     private void MovePlayerAfterPlay() {
         GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
         List<GameObject> movePlayer=new List<GameObject>();
@@ -269,13 +268,13 @@ public class Manager : Singleton<Manager> {
                 movePlayer.Add(p);
             }
         }
-        Debug.Log("move player count"+movePlayer.Count);
+     //   Debug.Log("move player count"+movePlayer.Count);
         
         for(int i = 0; i < movePlayer.Count; i++) {
         //    Debug.Log("MOVE SLOTS COUNTS" + movePlayer[i].GetComponent<Slot>().moves.Length);
             for(int j = 0; j < movePlayer[i].GetComponent<DragDrop>().parent.GetComponent<Slot>().moves.Length; j++) {
                 if (movePlayer[i].GetComponent<DragDrop>().parent.GetComponent<Slot>().moves[j].GetComponent<Slot>().status == 0) {
-                    movePlayer[i].GetComponent<DragDrop>().parent = movePlayer[i].GetComponent<DragDrop>().parent.GetComponent<Slot>().moves[j];
+                    movePlayer[i].GetComponent<DragDrop>().temparent = movePlayer[i].GetComponent<DragDrop>().parent.GetComponent<Slot>().moves[j];
                     movePlayer[i].GetComponent<DragDrop>().isSet = true;
                     movePlayer[i].GetComponent<DragDrop>().OnMouseUp();
                     movePlayer[i].GetComponent<DragDrop>().SizeDownDestroyableOpponents();
@@ -299,7 +298,10 @@ public class Manager : Singleton<Manager> {
         if (!isTurn) Player1.GetComponent<DragDrop>().SizeDownDestroyableOpponents();
         else Player2.GetComponent<DragDrop>().SizeDownDestroyableOpponents();
         isSpawn = false;
-        photonView.RPC("SetMyTurn", RpcTarget.All, isTurn);
+        if(!play)photonView.RPC("SetMyTurn", RpcTarget.All, isTurn);
+        else {  //Call player for the first time aftyer play
+            photonView.RPC("SetTurns", RpcTarget.Others, true);
+        }
     }
 
     [PunRPC]
@@ -307,29 +309,22 @@ public class Manager : Singleton<Manager> {
         StartCoroutine(MoveGottiPlay(pl));
     }
     IEnumerator MoveGottiPlay(bool P1) {
+        //Debug.Log("MoveGotti");
         EnableGottiMoveAfterPlay();
-        //if (P1) { Debug.Log("first plater moving firt"); }
-        //else { Debug.Log("2nd plater moving "); }
         int i = 0;
         while (i < 10) {
             yield return new WaitForSeconds(1);
             i++;
             photonView.RPC("ShowTimeAfterPlay", RpcTarget.All,P1, i);
         }
-        //it means player is not moved yet.
-        Debug.Log("oly move" + only1Move);
         if (only1Move) {
-            photonView.RPC("MovePlayerAfterPlay", RpcTarget.All);
+            //  photonView.RPC("" +
+            MovePlayerAfterPlay();
         }//
-        /////
         isSpawn = false;
         P1 = !P1;
-        Debug.Log("p1 reverse" + P1);
-        //  photonView.RPC("SetMyTurnPlay", RpcTarget.All, P1);
         photonView.RPC("SetTurns", RpcTarget.Others, P1);
-
     }
-
     #endregion Coroutines
 }
 
