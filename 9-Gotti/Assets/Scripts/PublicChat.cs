@@ -67,7 +67,7 @@ public class PublicChat : MonoBehaviour,IChatClientListener {
 
     public void OnConnected() {
         chatClient.Subscribe(new string[] { "Region" });
-        Debug.Log("connecting to chanel");
+       // Debug.Log("connecting to chanel");
 
     }
 
@@ -79,7 +79,7 @@ public class PublicChat : MonoBehaviour,IChatClientListener {
         for (int i = 0; i < senders.Length; i++) {
             //msg = string.Format( "{0}: {1}", "<color=purple>"+senders[i]+"</color>", messages[i]);
             chatDisplay.text += "\n" + "<color=purple>" + senders[i] + "</color>"+": "+ messages[i];
-            Debug.Log(msg);
+           // Debug.Log(msg);
         
         
         
@@ -92,7 +92,7 @@ public class PublicChat : MonoBehaviour,IChatClientListener {
 
     public void OnSubscribed(string[] channels, bool[] results) {
 //ChatPanel.SetActive(true);
-        Debug.Log("joined chanel");
+     //   Debug.Log("joined chanel");
 
     }
 

@@ -6,12 +6,22 @@ using Photon.Pun;
 using Photon.Realtime;
 
 public class Manager : Singleton<Manager> {
-    public Camera Camera;
+    #region UI
+    [Header("UI_Elements")]
     public Text[] playerNames;
     public Text[] TimeText;
+    public Text WinnerName;
+    public Text LoserName;
+    public GameObject MuteButton;
+    public GameObject UnMuteButton;
+    public GameObject MuteButtonAll;
+    public GameObject UnMuteButtonAll;
+    public GameObject resultScreen;
+    #endregion UI
+    public Camera Camera;
     public float p1X, p1Y, p1Z, p2X, p2Y, p2Z;
     public bool play, isSpawn = false;
-    private int distanceBtwPlayers = -25;
+    //private int distanceBtwPlayers = -25;
     private int placePlayerCount;
     private GameObject[] walls;
     private GameObject[] moves;
@@ -21,7 +31,9 @@ public class Manager : Singleton<Manager> {
     public bool isP1Turn = true;
     public bool takeTurn;
     public bool only1Move;
+    public bool isStop;
     public GameObject waltext;
+    private int playerCount;
     private GameObject Player1, Player2;
     public List<GameObject> destroyableOpponent = new List<GameObject>();
     private void Start() {
@@ -35,7 +47,7 @@ public class Manager : Singleton<Manager> {
     //DisplayTime for each player
     public void DisplayUserTime() {
         if (!play) {
-            Debug.Log("i am in first mlve");
+          //  Debug.Log("i am in first mlve");
             if (PhotonNetwork.IsMasterClient && isP1Turn) {
                 isSpawn = true;
                 Player1 = PhotonNetwork.Instantiate("Player1", new Vector3(p1X, p1Y, p1Z), Quaternion.identity);
@@ -185,7 +197,6 @@ public class Manager : Singleton<Manager> {
             }
         }
     }
-    //GameObject desPrnt = null;
     public void SetParentFree(string parentName) {
         foreach (GameObject m in moves) {
             if (m.name == parentName) {
@@ -201,9 +212,19 @@ public class Manager : Singleton<Manager> {
             w.GetComponent<Wall>().SetGottiDestroyableStatus();
         }
     }
-    
+    private void CheckPlayerCount() {
+        playerCount = 0;
+        GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
+        foreach (GameObject p in players) {
+            if (p.GetComponent<PhotonView>().IsMine) {
+                playerCount++;
+            }
+        }
+        if (playerCount <= 1) {
+            photonView.RPC("ShowResult", RpcTarget.All, PhotonNetwork.LocalPlayer.ActorNumber);
+        }
+    }
     #region RPC
-
     [PunRPC]
     public void SetParentMeshRPC(string movename, bool isEnable) {
         foreach (GameObject m in moves) {
@@ -227,11 +248,7 @@ public class Manager : Singleton<Manager> {
         isP1Turn = isTurn;
         DisplayUserTime();
     }
-    //[PunRPC]
-    //private void SetMyTurnPlay(bool isTurn) {
-    //    isP1Turn = isTurn;
-    //    DisplayUserMoves();
-    //}
+    
     [PunRPC]
     private void ShowTime(bool isTurn, int sec) {
         if (isTurn)
@@ -241,10 +258,12 @@ public class Manager : Singleton<Manager> {
     }
     [PunRPC]
     private void ShowTimeAfterPlay(bool isTurn, int sec) {
-        if (!isTurn)
-            TimeText[1].text = sec.ToString();
-        else
-            TimeText[0].text = sec.ToString();
+        if (!isStop) {
+            if (!isTurn)
+                TimeText[1].text = sec.ToString();
+            else
+                TimeText[0].text = sec.ToString();
+        }
     }
     [PunRPC]
     private void MovePlayerAutomatically(int id) {
@@ -258,7 +277,20 @@ public class Manager : Singleton<Manager> {
             }
         }
     }
-//    [PunRPC]
+    [PunRPC]
+    private void ShowResult(int id) {
+        isStop = true;
+        Photon.Realtime.Player[] players = PhotonNetwork.PlayerList;
+        foreach (Player p in players) {
+            if (p.ActorNumber == id) { 
+                LoserName.text = p.NickName + " Lose";//lose the game
+            } else {
+                WinnerName.text = p.NickName + " Won";
+            }
+        }
+        resultScreen.SetActive(true);
+        }
+
     private void MovePlayerAfterPlay() {
         GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
         List<GameObject> movePlayer=new List<GameObject>();
@@ -309,21 +341,33 @@ public class Manager : Singleton<Manager> {
         StartCoroutine(MoveGottiPlay(pl));
     }
     IEnumerator MoveGottiPlay(bool P1) {
-        //Debug.Log("MoveGotti");
-        EnableGottiMoveAfterPlay();
-        int i = 0;
-        while (i < 10) {
-            yield return new WaitForSeconds(1);
-            i++;
-            photonView.RPC("ShowTimeAfterPlay", RpcTarget.All,P1, i);
+        if (!isStop) {
+            //Debug.Log("MoveGotti");
+            EnableGottiMoveAfterPlay();
+            int i = 0;
+            while (i < 10) {
+                yield return new WaitForSeconds(1);
+                i++;
+                photonView.RPC("ShowTimeAfterPlay", RpcTarget.All, P1, i);
+            }
+            if (only1Move) {
+                //  photonView.RPC("" +
+                MovePlayerAfterPlay();
+            }//
+            Debug.Log(only1Move);
+            //DestroyAutoMatically or size down
+            GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
+            foreach (GameObject p in players) {
+                if (p.GetComponent<PhotonView>().IsMine) {
+                    p.GetComponent<DragDrop>().SizeDownDestroyableOpponents();
+                    break;
+                }
+            }
+            isSpawn = false;
+            P1 = !P1;
+            CheckPlayerCount();
+            photonView.RPC("SetTurns", RpcTarget.Others, P1);
         }
-        if (only1Move) {
-            //  photonView.RPC("" +
-            MovePlayerAfterPlay();
-        }//
-        isSpawn = false;
-        P1 = !P1;
-        photonView.RPC("SetTurns", RpcTarget.Others, P1);
     }
     #endregion Coroutines
 }

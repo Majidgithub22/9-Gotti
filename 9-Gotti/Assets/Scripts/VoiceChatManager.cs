@@ -42,7 +42,7 @@ public class VoiceChatManager : MonoBehaviourPunCallbacks
 
         rtcEngine.OnLeaveChannel += OnLeaveChannel;
         rtcEngine.OnError += OnError;
-        Debug.Log("hERE");
+        Debug.Log("hERE Voice Chat");
         rtcEngine.EnableSoundPositionIndication(true);
     }
 

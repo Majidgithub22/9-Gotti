@@ -9,6 +9,7 @@ TagManager:
   - Wall
   - Wall1
   - cube
+  - VManager
   layers:
   - Default
   - TransparentFX
