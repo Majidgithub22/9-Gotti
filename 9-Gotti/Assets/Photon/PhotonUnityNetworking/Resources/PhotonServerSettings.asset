@@ -13,11 +13,11 @@ MonoBehaviour:
   m_Name: PhotonServerSettings
   m_EditorClassIdentifier: 
   AppSettings:
-    AppIdRealtime: e050618b-1806-4526-94e2-3e6275fe4b06
+    AppIdRealtime: eece067e-1f6a-4265-92e1-32090275abbf
     AppIdFusion: 
     AppIdChat: a2213d74-95af-454e-833b-af32eb74e796
-    AppIdVoice: 
-    AppVersion: 1
+    AppIdVoice: 43419d00-e496-4a1b-978f-367230ad2152
+    AppVersion: 1.0
     UseNameServer: 1
     FixedRegion: us
     Server: 
@@ -34,9 +34,12 @@ MonoBehaviour:
   RunInBackground: 1
   StartInOfflineMode: 0
   RpcList:
+  - CantHearYou
+  - ChangeColour
   - ClickRpc
-  - DestroyPlayerRPC
   - DestroyRpc
+  - HeresWhy
+  - DestroyPlayerRPC
   - DestroySpaceship
   - Fire
   - MovePlayerAutomatically
@@ -46,16 +49,16 @@ MonoBehaviour:
   - SetMyTurn
   - SetParentMesh
   - SetParentMeshRPC
+  - SetTurns
   - SetWalls
   - showName
+  - ShowResult
   - ShowTime
+  - ShowTimeAfterPlay
   - UpdatePlaceCount
   - UpdatePlayerStatus
-  - MovePlayerAfterPlay
-  - SetMyTurnPlay
-  - SetTurns
-  - ShowTimeAfterPlay
-  - ShowResult
+  - DestroyGottiP1
+  - DestroyGottiP2
   DisableAutoOpenWizard: 1
   ShowSettings: 1
-  DevRegionSetOnce: 1
+  DevRegionSetOnce: 0

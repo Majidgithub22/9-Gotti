@@ -73,9 +73,9 @@ public class TestConnect : MonoBehaviourPunCallbacks {
     private void PlayerCount() {
         GameObject[] cubes = GameObject.FindGameObjectsWithTag("cube");
         if (cubes.Length >= 2) {
-         //   Debug.Log("in romm");
+            //   Debug.Log("in romm");
             OnCLick_StartGame();
-        }
     }
+}
    
 }

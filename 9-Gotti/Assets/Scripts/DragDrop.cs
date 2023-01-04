@@ -52,7 +52,7 @@ public class DragDrop : MonoBehaviour {
     public void OnMouseUp() {
         if (photonView.IsMine&&isTouch) {
             isDragging = false;
-            Manager.Instance.playerNames[3].text = "name "+gameObject.name;
+           // Manager.Instance.playerNames[3].text = "name "+gameObject.name;
             foreach (GameObject obj in list) {//sizing the nearby pillars down.Only they are in list
                 SizeDown(obj);
             }
@@ -75,7 +75,7 @@ public class DragDrop : MonoBehaviour {
                 transform.position = parent.transform.position;//
                 photonView.RPC("SetIsTouch", RpcTarget.All, gameObject.GetComponent<PhotonView>().ViewID, false);//isTouch = false;//can not touch until all gotti placed.
                 photonView.RPC("SetParentMesh",RpcTarget.All, parent.name, gameObject.GetComponent<PhotonView>().ViewID, false,1,true);//set status of  parent to 1, Making it RPC
-                Manager.Instance.playerNames[0].text = transform.position + "";
+            //    Manager.Instance.playerNames[0].text = transform.position + "";
                 checkSibling(wall);
                 checkSibling(wall1);
                 isSet = false;
@@ -103,10 +103,10 @@ public class DragDrop : MonoBehaviour {
             }
     }
     private void SizeUP(GameObject obj) {
-        obj.transform.localScale = new Vector3(28f, 5, 28f);
+        obj.transform.localScale = new Vector3(39f, 6, 39f);
     }
     private void SizeDown(GameObject obj) {
-        obj.transform.localScale = new Vector3(20, 5, 20);
+        obj.transform.localScale = new Vector3(35, 6, 35);
     }
     private void SizeUpDestroyableOpponents() {
         Manager.Instance.GetListOfDestroyablePlayers();
@@ -115,7 +115,7 @@ public class DragDrop : MonoBehaviour {
         for(int i=0;i < Manager.Instance.destroyableOpponent.Count; i++) {
             destPlayers.Add(Manager.Instance.destroyableOpponent[i]);
         }
-        Manager.Instance.playerNames[1].text = "size up"+destPlayers.Count;
+      //  Manager.Instance.playerNames[1].text = "size up"+destPlayers.Count;
         for (int i = 0; i < Manager.Instance.destroyableOpponent.Count; i++) {
             SizeUP(destPlayers[i].gameObject);
         }
@@ -135,14 +135,14 @@ public class DragDrop : MonoBehaviour {
             //Manager.Instance.playerNames[3].text = "marasi chly gae" + destPlayers.Count;
             //destroy player if not destroyed yet.
             if (Manager.Instance.isLineFormed) {
-                Manager.Instance.playerNames[3].text = "line is formed";
+            //    Manager.Instance.playerNames[3].text = "line is formed";
                 photonView.RPC("DestroyPlayerRPC", RpcTarget.AllBuffered, destPlayers[0].GetComponent<PhotonView>().ViewID);
                 destPlayers.RemoveAt(0);
             }
         
         Manager.Instance.isLineFormed = false;
             destPlayers.Clear();
-            Manager.Instance.playerNames[3].text = "listclear";
+         //   Manager.Instance.playerNames[3].text = "listclear";
       //  if(Manager.Instance.waltext.GetComponent<Wall>().g1!=null)
       //Debug.Log("2+"+  Manager.Instance.waltext.GetComponent<Wall>().g1.name);
       //  else { Debug.Log("1null"); }

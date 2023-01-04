@@ -97,7 +97,8 @@ public class SpatialAudio : MonoBehaviour
         return dotProduct;
     }
     public void Mute() {
-        VoiceChatManager.Instance.Mute();
+     //   VoiceChatManager.Instance.Mute();
+     
         Manager.Instance.MuteButton.SetActive(false);
         Manager.Instance.UnMuteButton.SetActive(true);
     }
