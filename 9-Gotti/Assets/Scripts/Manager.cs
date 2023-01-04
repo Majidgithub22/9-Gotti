@@ -64,10 +64,12 @@ public class Manager : Singleton<Manager> {
           //  Debug.Log("i am in first mlve");
             if (PhotonNetwork.IsMasterClient && isP1Turn) {
                 isSpawn = true;
+                photonView.RPC("DestroyGottiP1", RpcTarget.All);
                 Player1 = PhotonNetwork.Instantiate("Player1", new Vector3(p1X, p1Y, p1Z), Quaternion.identity);
                 StartCoroutine(DisplayTime(false, Player1));
                // photonView.RPC("DestroyGottiP1", RpcTarget.All);
             } else if (!isP1Turn && !PhotonNetwork.IsMasterClient) {
+                photonView.RPC("DestroyGottiP2", RpcTarget.All);
                 isSpawn = true;
                 Player2 = PhotonNetwork.Instantiate("Player2", new Vector3(p2X, p2Y, p2Z), Quaternion.identity);
                 StartCoroutine(DisplayTime(true, Player2));
@@ -185,7 +187,6 @@ public class Manager : Singleton<Manager> {
             Destroy(ShowDummyGotti1[io].gameObject);
             io++;
         }
-        
     }
     [PunRPC]
     private void DestroyGottiP2() {
@@ -363,7 +364,7 @@ public class Manager : Singleton<Manager> {
         if (!isTurn) Player1.GetComponent<DragDrop>().SizeDownDestroyableOpponents();
         else Player2.GetComponent<DragDrop>().SizeDownDestroyableOpponents();
                 
-        if (isTurn) { photonView.RPC("DestroyGottiP2", RpcTarget.All); } else { photonView.RPC("DestroyGottiP1", RpcTarget.All); }
+        ////if (isTurn) { photonView.RPC("DestroyGottiP2", RpcTarget.All); } else { photonView.RPC("DestroyGottiP1", RpcTarget.All); }
         isSpawn = false;
         if (!play) {
             photonView.RPC("SetMyTurn", RpcTarget.All, isTurn);
