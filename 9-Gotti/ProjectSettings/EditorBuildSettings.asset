@@ -17,4 +17,10 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/Photon/PhotonVoice/Demos/DemoVoiceProximityChat/Scenes/ProximityVoiceChat.unity
     guid: 9f1cd40f49900e341843571f937a9c61
+  - enabled: 0
+    path: Assets/Photon/PhotonVoice/Demos/DemoVoicePun/DemoVoicePun-Scene.unity
+    guid: a3f3c3b3816924199acba595045624d2
+  - enabled: 0
+    path: Assets/Photon/PhotonVoice/Demos/DemoVoiceUI/DemoVoiceUI.unity
+    guid: 0ab5c0cab248b1c449cb35dd2672ffdb
   m_configObjects: {}

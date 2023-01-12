@@ -22,11 +22,11 @@ public class Manager : Singleton<Manager> {
     #endregion UI
     public Camera Camera;
     public float p1X, p1Y, p1Z, p2X, p2Y, p2Z;
-    public bool play, isSpawn = false;
+    public bool play=false, isSpawn = false;
     //private int distanceBtwPlayers = -25;
     private int placePlayerCount;
     private GameObject[] walls;
-    private GameObject[] moves;
+    public GameObject[] moves;
     public List<GameObject> emptyMovesList = new List<GameObject>();
     public List<GameObject> ShowDummyGotti1 = new List<GameObject>();
     public List<GameObject> ShowDummyGotti2 = new List<GameObject>();
@@ -327,18 +327,18 @@ public class Manager : Singleton<Manager> {
 
     private void MovePlayerAfterPlay() {
         GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
-        List<GameObject> movePlayer=new List<GameObject>();
+        List<GameObject> movePlayer = new List<GameObject>();
         movePlayer.Clear();
         foreach (GameObject p in players) {
             if (p.GetComponent<PhotonView>().IsMine) {
                 movePlayer.Add(p);
             }
         }
-     //   Debug.Log("move player count"+movePlayer.Count);
-        
-        for(int i = 0; i < movePlayer.Count; i++) {
-        //    Debug.Log("MOVE SLOTS COUNTS" + movePlayer[i].GetComponent<Slot>().moves.Length);
-            for(int j = 0; j < movePlayer[i].GetComponent<DragDrop>().parent.GetComponent<Slot>().moves.Length; j++) {
+        //   Debug.Log("move player count"+movePlayer.Count);
+
+        for (int i = 0; i < movePlayer.Count; i++) {
+            //    Debug.Log("MOVE SLOTS COUNTS" + movePlayer[i].GetComponent<Slot>().moves.Length);
+            for (int j = 0; j < movePlayer[i].GetComponent<DragDrop>().parent.GetComponent<Slot>().moves.Length; j++) {
                 if (movePlayer[i].GetComponent<DragDrop>().parent.GetComponent<Slot>().moves[j].GetComponent<Slot>().status == 0) {
                     movePlayer[i].GetComponent<DragDrop>().temparent = movePlayer[i].GetComponent<DragDrop>().parent.GetComponent<Slot>().moves[j];
                     movePlayer[i].GetComponent<DragDrop>().isSet = true;
@@ -346,6 +346,17 @@ public class Manager : Singleton<Manager> {
                     movePlayer[i].GetComponent<DragDrop>().SizeDownDestroyableOpponents();
                     return;
                 }
+            }
+        }
+    }
+    private void SizeDOwnPlayerAfterPlay() {
+        GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
+        foreach (GameObject p in players) {
+            if (p.GetComponent<PhotonView>().IsMine) {
+                p.GetComponent<DragDrop>().OnMouseUp();
+                p.GetComponent<DragDrop>().SizeDownDestroyableOpponents();
+                p.GetComponent<DragDrop>().SizeDownNeigbourMoves();
+
             }
         }
     }
@@ -391,6 +402,7 @@ public class Manager : Singleton<Manager> {
                 //  photonView.RPC("" +
                 MovePlayerAfterPlay();
             }//
+            SizeDOwnPlayerAfterPlay();
             Debug.Log(only1Move);
             //DestroyAutoMatically or size down
             GameObject[] players = GameObject.FindGameObjectsWithTag("Player");

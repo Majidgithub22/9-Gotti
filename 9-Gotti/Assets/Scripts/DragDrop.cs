@@ -45,6 +45,8 @@ public class DragDrop : MonoBehaviour {
                 if (!gameObject.GetComponent<DragDrop>().isDestroyable&& !gameObject.GetComponent<DragDrop>().isTouch) {//touch is for don't destroy gotti that is not m
                     photonView.RPC("DestroyPlayerRPC", RpcTarget.All, gameObject.GetComponent<PhotonView>().ViewID);
                     Manager.Instance.isLineFormed = false;
+                    gameObject.GetComponent<DragDrop>().SizeDownDestroyableOpponents();
+                   // gameObject.GetComponent<DragDrop>().SizeDownNeigbourMoves();
                 }
             }
         }
@@ -52,9 +54,8 @@ public class DragDrop : MonoBehaviour {
     public void OnMouseUp() {
         if (photonView.IsMine&&isTouch) {
             isDragging = false;
-           // Manager.Instance.playerNames[3].text = "name "+gameObject.name;
             foreach (GameObject obj in list) {//sizing the nearby pillars down.Only they are in list
-                SizeDown(obj);
+                SizeDown(obj,25,5,25);
             }
             if (!isSet) {
                 transform.position = startPos;
@@ -99,14 +100,20 @@ public class DragDrop : MonoBehaviour {
             if (parent.GetComponent<Slot>().moves[i].GetComponent<Slot>().status == 0) {//checking if parent pillar neihbour moves are free add them to list
                 list.Add(parent.GetComponent<Slot>().moves[i].gameObject);
                 parent.GetComponent<Slot>().moves[i].GetComponent<CapsuleCollider>().enabled = true;//enable only those who are in neighbour and free
-                SizeUP(parent.GetComponent<Slot>().moves[i].gameObject);//now activate them.
+                SizeUP(parent.GetComponent<Slot>().moves[i].gameObject,30,5,30);//now activate them.
             }
     }
-    private void SizeUP(GameObject obj) {
-        obj.transform.localScale = new Vector3(39f, 6, 39f);
+    public void SizeDownNeigbourMoves() {
+        Manager.Instance.DisableMoves();// Disale every pillar collider
+        for (int i = 0; i < Manager.Instance.moves.Length; i++) { 
+                SizeDown(Manager.Instance.moves[i].gameObject,20,5,20);//now activate them.
+            }
     }
-    private void SizeDown(GameObject obj) {
-        obj.transform.localScale = new Vector3(35, 6, 35);
+    private void SizeUP(GameObject obj,float x,float y,float z) {
+        obj.transform.localScale = new Vector3(x, y, z);
+    }
+    private void SizeDown(GameObject obj,float x,float y,float z) {
+        obj.transform.localScale = new Vector3(x, y, z);
     }
     private void SizeUpDestroyableOpponents() {
         Manager.Instance.GetListOfDestroyablePlayers();
@@ -117,7 +124,7 @@ public class DragDrop : MonoBehaviour {
         }
       //  Manager.Instance.playerNames[1].text = "size up"+destPlayers.Count;
         for (int i = 0; i < Manager.Instance.destroyableOpponent.Count; i++) {
-            SizeUP(destPlayers[i].gameObject);
+            SizeUP(destPlayers[i].gameObject,42,6,42);
         }
     }
     public void SizeDownDestroyableOpponents() {
@@ -130,7 +137,7 @@ public class DragDrop : MonoBehaviour {
             }
            // Manager.Instance.playerNames[3].text = "sizedow" + destPlayers.Count;
             for (int i = 0; i < Manager.Instance.destroyableOpponent.Count; i++) {
-                SizeDown(destPlayers[i].gameObject);
+                SizeDown(destPlayers[i].gameObject,35,6,35);
             }
             //Manager.Instance.playerNames[3].text = "marasi chly gae" + destPlayers.Count;
             //destroy player if not destroyed yet.
@@ -142,10 +149,6 @@ public class DragDrop : MonoBehaviour {
         
         Manager.Instance.isLineFormed = false;
             destPlayers.Clear();
-         //   Manager.Instance.playerNames[3].text = "listclear";
-      //  if(Manager.Instance.waltext.GetComponent<Wall>().g1!=null)
-      //Debug.Log("2+"+  Manager.Instance.waltext.GetComponent<Wall>().g1.name);
-      //  else { Debug.Log("1null"); }
        }
     }
     private void checkSibling(GameObject wall) {
