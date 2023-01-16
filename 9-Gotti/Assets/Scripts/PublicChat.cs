@@ -36,10 +36,11 @@ public class PublicChat : MonoBehaviour,IChatClientListener {
         if (this.chatClient != null) {
             this.chatClient.Service();
         }
-        if (!string.IsNullOrEmpty(chatField.text) && (Input.GetKey(KeyCode.Return) || Input.GetKey(KeyCode.KeypadEnter))) {
-            chatClient.Service();
-            SubmitPublicChat();
-        } }
+        //if (!string.IsNullOrEmpty(chatField.text) && (Input.GetKey(KeyCode.Return) || Input.GetKey(KeyCode.KeypadEnter))) {
+        //    chatClient.Service();
+        //    SubmitPublicChat();
+        //}
+    }
     public void SubmitPublicChat() {
        // if (privateReceiever == "") {
             chatClient.PublishMessage("Region", currentChat);

@@ -166,7 +166,7 @@ public class DragDrop : MonoBehaviour {
                 wall.GetComponent<Wall>().g3 = gameObject;
                 wall.GetComponent<Wall>().p3 = true;
                 //check if 3 gotttis are mine then move.
-                if (wall.GetComponent<Wall>().g1.GetComponent<PhotonView>().IsMine && wall.GetComponent<Wall>().g2.GetComponent<PhotonView>().IsMine && wall.GetComponent<Wall>().g3.GetComponent<PhotonView>().IsMine) {
+                if (wall.GetComponent<Wall>().g1 !=null&& wall.GetComponent<Wall>().g1.GetComponent<PhotonView>().IsMine && wall.GetComponent<Wall>().g2&& wall.GetComponent<Wall>().g2.GetComponent<PhotonView>().IsMine&&wall.GetComponent<Wall>().g3 && wall.GetComponent<Wall>().g3.GetComponent<PhotonView>().IsMine) {
                     photonView.RPC("UpdatePlayerStatus", RpcTarget.All, wall.GetComponent<Wall>().g1.GetComponent<PhotonView>().ViewID, true);
                     photonView.RPC("UpdatePlayerStatus", RpcTarget.All, wall.GetComponent<Wall>().g2.GetComponent<PhotonView>().ViewID,true);
                     photonView.RPC("UpdatePlayerStatus", RpcTarget.All, wall.GetComponent<Wall>().g3.GetComponent<PhotonView>().ViewID, true);

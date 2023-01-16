@@ -253,7 +253,7 @@ public class Manager : Singleton<Manager> {
                 playerCount++;
             }
         }
-        if (playerCount <= 1) {
+        if (playerCount <= 2) {
             photonView.RPC("ShowResult", RpcTarget.All, PhotonNetwork.LocalPlayer.ActorNumber);
         }
     }
@@ -414,6 +414,7 @@ public class Manager : Singleton<Manager> {
             }
             isSpawn = false;
             P1 = !P1;
+            isLineFormed = false;
             CheckPlayerCount();
             photonView.RPC("SetTurns", RpcTarget.Others, P1);
         }
