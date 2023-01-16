@@ -378,7 +378,7 @@ public class Manager : Singleton<Manager> {
         }
         if (!isTurn) Player1.GetComponent<DragDrop>().SizeDownDestroyableOpponents();
         else Player2.GetComponent<DragDrop>().SizeDownDestroyableOpponents();
-                
+        isLineFormed = false;     
         ////if (isTurn) { photonView.RPC("DestroyGottiP2", RpcTarget.All); } else { photonView.RPC("DestroyGottiP1", RpcTarget.All); }
         isSpawn = false;
         if (!play) {
