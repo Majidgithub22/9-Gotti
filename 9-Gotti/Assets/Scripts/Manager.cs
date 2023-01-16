@@ -42,18 +42,22 @@ public class Manager : Singleton<Manager> {
     public List<GameObject> destroyableOpponent = new List<GameObject>();
     private void Start() {
         photonView = GetComponent<PhotonView>();
+        PhotonNetwork.Instantiate("1",transform.position,transform.rotation);
         walls = GameObject.FindGameObjectsWithTag("Wall");
         moves = GameObject.FindGameObjectsWithTag("Pillar");
         photonView.RPC("showName", RpcTarget.AllBuffered);
         DisplayUserTime();
     }
     public void Mute() {
-        recorder.TransmitEnabled= false;
+        VoiceChatManager.Instance.Mute();
+
+        //recorder.TransmitEnabled= false;
         MuteButton.SetActive(false);
         UnMuteButton.SetActive(true);
     }
     public void UnMute() {
-        recorder.TransmitEnabled = true;
+        VoiceChatManager.Instance.UnMute();
+        //recorder.TransmitEnabled = true;
         MuteButton.SetActive(true);
         UnMuteButton.SetActive(false);
     }
