@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.4371147, g: 0.48483258, b: 0.565098, a: 1}
+  m_IndirectSpecularColor: {r: 0.4371144, g: 0.48483187, b: 0.56509703, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -1003,8 +1003,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: SpatialAudio, Assembly-CSharp
+      - m_Target: {fileID: 2036157548}
+        m_TargetAssemblyTypeName: Manager, Assembly-CSharp
         m_MethodName: Mute
         m_Mode: 1
         m_Arguments:
@@ -10140,8 +10140,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: SpatialAudio, Assembly-CSharp
+      - m_Target: {fileID: 2036157548}
+        m_TargetAssemblyTypeName: Manager, Assembly-CSharp
         m_MethodName: UnMute
         m_Mode: 1
         m_Arguments:
@@ -10407,6 +10407,7 @@ MonoBehaviour:
   p2Z: 350
   play: 0
   isSpawn: 0
+  moves: []
   emptyMovesList: []
   ShowDummyGotti1:
   - {fileID: 807454074}
@@ -10450,6 +10451,7 @@ MonoBehaviour:
   Prefabs:
   - {fileID: 9010715093899897465, guid: 61d03016aa9f9ca4da2293a62b63e5ba, type: 3}
   - {fileID: 3039593359767747667, guid: 5b37db2f5f746324db491f763f3b2cc7, type: 3}
+  - {fileID: 1185360671552331713, guid: 8f879c1f5612a7342b331099aa107943, type: 3}
 --- !u!114 &2036157550
 MonoBehaviour:
   m_ObjectHideFlags: 0
