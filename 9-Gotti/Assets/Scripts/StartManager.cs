@@ -9,12 +9,12 @@ public class StartManager : MonoBehaviour
     public GameObject NameEnterScreen;
     public Session session;
     public InputField name;
-    private void Awake() {
-        if (!string.IsNullOrEmpty(session.name)) {
-            ConnectingScreen.SetActive(true);
-            NameEnterScreen.SetActive(false);
-        }
-    }
+    //private void Awake() {
+    //    if (!string.IsNullOrEmpty(session.name)) {
+    //        ConnectingScreen.SetActive(true);
+    //        NameEnterScreen.SetActive(false);
+    //    }
+    //}
     public void Go() {
         if(!string.IsNullOrEmpty(name.text)) {
             session.name= name.text;

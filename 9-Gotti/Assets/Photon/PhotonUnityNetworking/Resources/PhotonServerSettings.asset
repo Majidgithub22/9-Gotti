@@ -59,6 +59,8 @@ MonoBehaviour:
   - UpdatePlayerStatus
   - DestroyGottiP1
   - DestroyGottiP2
+  - NotifyUser
+  - ShowEmoji
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 0

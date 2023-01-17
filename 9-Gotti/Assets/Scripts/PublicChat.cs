@@ -11,6 +11,7 @@ public class PublicChat : MonoBehaviour,IChatClientListener {
     ChatClient chatClient;
     bool isConnected;
     string UserName;
+    PhotonView photonView;
     public void UsernameOnValueChange(string valueIn) {
         //=valueIn;
     }
@@ -28,9 +29,8 @@ public class PublicChat : MonoBehaviour,IChatClientListener {
     public Text chatDisplay;
     public GameObject CHatPanels;
     void Start() {
-       Debug.Log("user Conecting");
-     //   ChatPanel.SetActive(false); 
         ChatConectOnCLick();
+        photonView= GetComponent<PhotonView>();
     }
     void Update() {
         if (this.chatClient != null) {
@@ -42,16 +42,24 @@ public class PublicChat : MonoBehaviour,IChatClientListener {
         //}
     }
     public void SubmitPublicChat() {
-       // if (privateReceiever == "") {
             chatClient.PublishMessage("Region", currentChat);
             currentChat = "";
             chatField.text = "";
             chatField.ActivateInputField();
-        //}
+         photonView.RPC("NotifyUser", RpcTarget.Others, PhotonNetwork.NickName);
+    }
+    [PunRPC]
+    private void NotifyUser(string name) {
+        Manager.Instance.NotificationOfMsg.text = name + " sent a message";
+        Manager.Instance.NotificationOfMsg.gameObject.transform.parent.gameObject.SetActive(true);
+        StartCoroutine(DisableNotifyMSG());
+    }
+    IEnumerator DisableNotifyMSG() {
+        yield return new WaitForSeconds(3);
+        Manager.Instance.NotificationOfMsg.gameObject.transform.parent.gameObject.SetActive(false);
     }
     public void TypeValueChanged(string valueIn) {
         currentChat=valueIn;
-        Debug.Log("typing");
     }
     public void OpenCHatPanel() {
         CHatPanels.SetActive(true);
@@ -87,14 +95,10 @@ public class PublicChat : MonoBehaviour,IChatClientListener {
         
         }
     }
-
     public void OnPrivateMessage(string sender, object message, string channelName) {
     }
 
     public void OnSubscribed(string[] channels, bool[] results) {
-//ChatPanel.SetActive(true);
-     //   Debug.Log("joined chanel");
-
     }
 
     public void OnUnsubscribed(string[] channels) {

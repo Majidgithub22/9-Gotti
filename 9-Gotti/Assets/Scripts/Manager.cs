@@ -14,6 +14,12 @@ public class Manager : Singleton<Manager> {
     public Text[] TimeText;
     public Text WinnerName;
     public Text LoserName;
+    public Text NotificationOfMsg;
+    public GameObject EmojiPanel;
+    public GameObject EmojiOPenButton;
+    public GameObject EmojiCloseButton;
+    public GameObject EmojiEffect;
+    public Sprite[] Emojis;
     public GameObject MuteButton;
     public GameObject UnMuteButton;
     public GameObject MuteButtonAll;
@@ -48,6 +54,7 @@ public class Manager : Singleton<Manager> {
         photonView.RPC("showName", RpcTarget.AllBuffered);
         DisplayUserTime();
     }
+    #region UIButtons
     public void Mute() {
         VoiceChatManager.Instance.Mute();
 
@@ -61,6 +68,53 @@ public class Manager : Singleton<Manager> {
         MuteButton.SetActive(true);
         UnMuteButton.SetActive(false);
     }
+    public void MuteALL() {
+        VoiceChatManager.Instance.MuteAll();
+
+        //recorder.TransmitEnabled= false;
+        MuteButtonAll.SetActive(false);
+        UnMuteButtonAll.SetActive(true);
+    }
+    public void UnMuteAll() {
+        VoiceChatManager.Instance.UnmuteAll();
+        //recorder.TransmitEnabled = true;
+        MuteButtonAll.SetActive(true);
+        UnMuteButtonAll.SetActive(false);
+    }
+    public void OPenEmojiPanel() {
+        EmojiPanel.SetActive(true);
+    }
+   
+    public void ScaleUp(Transform transform) {
+        StartCoroutine(Scaling(transform));
+    }
+    IEnumerator Scaling(Transform transform) {
+        float i = 1.2f;
+        while (i >= 0) {
+            yield return new WaitForSeconds(.1f);
+            i -= .1f;
+            transform.localScale = new Vector3(i, i, i);
+        }
+    }
+    #endregion UIButtons
+    #region Emoji
+    public void SendEmojiEffect(int index) {
+        photonView.RPC("ShowEmoji", RpcTarget.All, index);
+    }
+    [PunRPC]
+    private void ShowEmoji(int index) {
+        EmojiPanel.SetActive(false);
+        EmojiEffect.gameObject.SetActive(true);//first activate it
+        EmojiEffect.GetComponent<Image>().sprite = Emojis[index];//then place the effect on image
+        ScaleUp(EmojiEffect.transform);
+        //UIManager.Instance.ScaleUp(UIManager.Instance.PublicEmojiEffect.GetComponent<Transform>().transform);
+        StartCoroutine(DisableEmojiEffect());//after sometime disable it.
+    }
+    IEnumerator DisableEmojiEffect() {
+        yield return new WaitForSeconds(3);
+        EmojiEffect.gameObject.SetActive(false);
+    }
+    #endregion Emoji
     #region PlayerFunctions
     //DisplayTime for each player
     public void DisplayUserTime() {

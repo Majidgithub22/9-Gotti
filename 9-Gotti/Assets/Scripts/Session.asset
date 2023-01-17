@@ -12,10 +12,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e98274f5ab48cf24dbe525d8c9a15a46, type: 3}
   m_Name: Session
   m_EditorClassIdentifier: 
-  mode: 0
-  levelNo: 0
-  carNumber: 0
-  totalLevel: 0
-  unlocklevels: 0
-  name: 
-  Loading: {fileID: 0}
+  name: zunaira
