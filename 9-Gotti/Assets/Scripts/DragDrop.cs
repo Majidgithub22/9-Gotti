@@ -80,9 +80,9 @@ public class DragDrop : MonoBehaviour {
                 checkSibling(wall);
                 checkSibling(wall1);
                 isSet = false;
-                Manager.Instance.WallGottiCheck();
                 photonView.RPC("UpdatePlaceCount", RpcTarget.All);//again enable drag drop
                 Manager.Instance.EmptyMoves();//Count empty moves.
+                Manager.Instance.WallGottiCheck();
             }
         } 
     }

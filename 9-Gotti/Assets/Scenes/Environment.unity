@@ -12594,6 +12594,23 @@ MonoBehaviour:
   p2Z: 350
   play: 0
   isSpawn: 0
+  walls:
+  - {fileID: 765379097}
+  - {fileID: 62242272}
+  - {fileID: 646218750}
+  - {fileID: 567694933}
+  - {fileID: 983806552}
+  - {fileID: 516553259}
+  - {fileID: 747501934}
+  - {fileID: 269735198}
+  - {fileID: 320015042}
+  - {fileID: 757963330}
+  - {fileID: 837191716}
+  - {fileID: 1916081924}
+  - {fileID: 1839952430}
+  - {fileID: 1555503344}
+  - {fileID: 1520596677}
+  - {fileID: 289527414}
   moves: []
   emptyMovesList: []
   ShowDummyGotti1:

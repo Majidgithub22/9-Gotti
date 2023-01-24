@@ -31,7 +31,7 @@ public class Manager : Singleton<Manager> {
     public bool play=false, isSpawn = false;
     //private int distanceBtwPlayers = -25;
     private int placePlayerCount;
-    private GameObject[] walls;
+    public GameObject[] walls;
     public GameObject[] moves;
     public List<GameObject> emptyMovesList = new List<GameObject>();
     public List<GameObject> ShowDummyGotti1 = new List<GameObject>();
@@ -49,7 +49,6 @@ public class Manager : Singleton<Manager> {
     private void Start() {
         photonView = GetComponent<PhotonView>();
         PhotonNetwork.Instantiate("1",transform.position,transform.rotation);
-        walls = GameObject.FindGameObjectsWithTag("Wall");
         moves = GameObject.FindGameObjectsWithTag("Pillar");
         photonView.RPC("showName", RpcTarget.AllBuffered);
         DisplayUserTime();
@@ -210,12 +209,16 @@ public class Manager : Singleton<Manager> {
                 p.GetComponent<DragDrop>().parent.GetComponent<MeshRenderer>().enabled = true;
              //   playerNames[3].text = "" + p.GetComponent<DragDrop>().wall;
                 if (p.GetComponent<PhotonView>().IsMine) {
+                    Debug.Log("wall" + p.GetComponent<DragDrop>().wall.name + "wall1" + p.GetComponent<DragDrop>().wall1.name);
                     p.GetComponent<DragDrop>().CheckPreviousParentDest(p.GetComponent<DragDrop>().wall, p.GetComponent<PhotonView>().ViewID);
+                    Debug.Log("Player alive" + p.GetComponent<DragDrop>().wall + "     wall1" + p.GetComponent<DragDrop>().wall1.name);
                     p.GetComponent<DragDrop>().CheckPreviousParentDest(p.GetComponent<DragDrop>().wall1, p.GetComponent<PhotonView>().ViewID);
+                    Debug.Log("Player alive" + p.GetComponent<DragDrop>().wall + "     wall1" + p.GetComponent<DragDrop>().wall1.name);
+                    Destroy(p.gameObject);
                 }
                 //playerNames[3].text = "";
-               // Debug.Log("wall p1" + p.GetComponent<DragDrop>().wall.GetComponent<Wall>().g1);
-                Destroy(p.gameObject);
+                // Debug.Log("wall p1" + p.GetComponent<DragDrop>().wall.GetComponent<Wall>().g1);
+                if (!p.GetComponent<PhotonView>().IsMine) { Destroy(p.gameObject); }
               //  Debug.Log("wall p1" + p.GetComponent<DragDrop>().wall.GetComponent<Wall>().g1);
                 //playerNames[3].text = "done";
                 found = true;
@@ -361,7 +364,7 @@ public class Manager : Singleton<Manager> {
         GameObject m = emptyMovesList[0];
         GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
         foreach (GameObject p in players) {
-            Debug.Log("move auto" + p.GetComponent<PhotonView>().ViewID);
+         //   Debug.Log("move auto" + p.GetComponent<PhotonView>().ViewID);
             if (p.GetComponent<PhotonView>().ViewID == id) {
                 p.GetComponent<DragDrop>().temparent = m;
                 p.GetComponent<DragDrop>().isSet = true;
